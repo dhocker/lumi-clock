@@ -24,6 +24,7 @@ import tkinter as tk # In python2 it's Tkinter
 from tkinter import font as tkfont
 import datetime
 import glob
+import sys
 from functools import partial
 from animated_gif_label import AnimatedGIFLabel
 
@@ -37,11 +38,13 @@ class LumiClockApplication(tk.Frame):
         self.last_time = ""
         self.master = master
         self.toggle_ampm = True
+        self.fullscreen = True
 
         # Screen dimensions
         self.screen_width = self.master.winfo_screenwidth()
         self.screen_height = self.master.winfo_screenheight()
-        geo = "{0}x{1}".format(int(800), int(self.screen_height / 2))
+        print(self.screen_width, "x", self.screen_height)
+        geo = "{0}x{1}".format(int(1000), int(self.screen_height / 2))
         self.master.geometry(geo)
         self.master["bg"] = 'black'
 
@@ -54,7 +57,6 @@ class LumiClockApplication(tk.Frame):
         self._createWidgets()
 
         # Set up escape key as full screen toggle
-        self.fullscreen = True
         self.master.bind("<Escape>", self._toggle_fullscreen)
         self._toggle_fullscreen()
         #self.master.attributes("-fullscreen", self.fullscreen)
@@ -62,8 +64,14 @@ class LumiClockApplication(tk.Frame):
 
         # Capture left mouse double clicks anywhere in the Frame
         self.master.bind("<Double-Button-1>", self.quit_app)
+        # The right mouse button is OS dependendent
         # Capture right mouse clicks
-        # self.master.bind("<Button-2>", self._click_handler)
+        if sys.platform.startswith('darwin'):
+            # On macOS button 2 is the right button
+            self.master.bind("<Button-2>", self._click_handler)
+        else:
+            # On other systems button 3 is the right button
+            self.master.bind("<Button-3>", self._click_handler)
 
         self.context_menu = ContextMenu(self)
 
@@ -76,6 +84,13 @@ class LumiClockApplication(tk.Frame):
     def _toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen  # Just toggling the boolean
         self.master.attributes("-fullscreen", self.fullscreen)
+        # Adjust row height for effective size of window
+        # The goal is to get the clock vertically centered
+        if self.fullscreen:
+            self.rowconfigure(0, minsize=int(self.screen_height))
+        else:
+            self.rowconfigure(0, minsize=int(self.screen_height / 2))
+        self._update_clock()
         return "break"
 
     def _click_handler(self, event):
@@ -98,12 +113,12 @@ class LumiClockApplication(tk.Frame):
         # Sets the label text (the clock) statically
         # Hunt for a color...
         self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg="#EC3818", bg='black')
-        self.textbox.grid(row=r, column=0)
+        self.textbox.grid(row=r, column=0, sticky=tk.W+tk.N+tk.S)
 
         # image display
         # animated GIF
         self.image_label = AnimatedGIFLabel(bg='black')
-        self.image_label.grid(row=r, column=1, sticky=tk.W+tk.N+tk.S)
+        self.image_label.grid(row=r, column=1, sticky=tk.E+tk.N+tk.S)
         # http://www.chimply.com/Generator#classic-spinner,animatedTriangles
         # TODO Better way to select default spinner
         self.image_label.load("spiral_triangles.gif")
@@ -131,6 +146,9 @@ class LumiClockApplication(tk.Frame):
         self.toggle_ampm = not self.toggle_ampm
         if current[0] == '0':
             current = " " + current[1:]
+        # HACK to space clock digits and spinner
+        if self.fullscreen:
+            current += " "
         if self.last_time != current:
             # How to change the label in code
             self.textbox["text"] = current
