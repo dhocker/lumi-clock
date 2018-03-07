@@ -67,8 +67,8 @@ class LumiClockApplication(tk.Frame):
 
         self.context_menu = ContextMenu(self)
 
-        # Capture left mouse double clicks anywhere in the Frame
-        self.master.bind("<Button-2>", self._show_context_menu)
+        # Capture left mouse single click anywhere in the Frame
+        self.master.bind("<Button-1>", self._show_context_menu)
 
     def _show_context_menu(self, event):
         self.context_menu.post(event.x_root, event.y_root)
