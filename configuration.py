@@ -64,7 +64,6 @@ class QConfiguration:
             cfj = json.loads(cf.read())
             if "loglevel" in cfj:
                 cls.loglevel = cfj["loglevel"]
-                the_app_logger.set_log_level(cls.loglevel)
             if "font" in cfj:
                 cls.font = cfj["font"]
             if "spinner" in cfj:
@@ -72,7 +71,7 @@ class QConfiguration:
             if "color" in cfj:
                 cls.color = cfj["color"]
             cf.close()
-            cls.iex_conf_exists = True
+            cls.conf_exists = True
         except FileNotFoundError as ex:
             logger.error("%s was not found", cls.full_file_path)
         except Exception as ex:

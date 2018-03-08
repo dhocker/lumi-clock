@@ -28,6 +28,12 @@ import sys
 from functools import partial
 from animated_gif_label import AnimatedGIFLabel
 from configuration import QConfiguration
+from app_logger import AppLogger
+
+
+# Logger init
+the_app_logger = AppLogger("lumiclock")
+logger = the_app_logger.getAppLogger()
 
 
 class LumiClockApplication(tk.Frame):
@@ -103,17 +109,12 @@ class LumiClockApplication(tk.Frame):
     def _createWidgets(self):
         r = 0
 
-        # Try out fonts and in a label
-
-        #self.clockfont = tkfont.Font(family='Helvetica', size=72*3)
-        #self.clockfont = tkfont.Font(family='readoutcondensed', size=72*3, weight='bold')
-        self.clockfont = tkfont.Font(family='Digital-7 Mono', size=72*3)
-        print (self.clockfont.actual())
-        print (self.clockfont.metrics())
+        self.clockfont = tkfont.Font(family=QConfiguration.font, size=72*3)
+        logger.debug(self.clockfont.actual())
+        logger.debug(self.clockfont.metrics())
 
         # Sets the label text (the clock) statically
-        # Hunt for a color...
-        self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg="#EC3818", bg='black')
+        self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg=QConfiguration.color, bg='black')
         self.textbox.grid(row=r, column=0, sticky=tk.W+tk.N+tk.S)
 
         # image display
@@ -121,15 +122,15 @@ class LumiClockApplication(tk.Frame):
         self.image_label = AnimatedGIFLabel(bg='black')
         self.image_label.grid(row=r, column=1, sticky=tk.E+tk.N+tk.S)
         # http://www.chimply.com/Generator#classic-spinner,animatedTriangles
-        # TODO Better way to select default spinner
-        self.image_label.load("spiral_triangles.gif")
+        # Select default spinner
+        self.image_label.load(QConfiguration.spinner)
         # self.image_label.delay = 160
 
         r += 1
 
-        self.label = tk.Label(self, text="Quit label:", bg="#EC3818")
+        self.label = tk.Label(self, text="Quit label:", bg=QConfiguration.color)
         self.label.grid(row=r, column=0, sticky=tk.W)
-        self.quitButton = tk.Button(self, bg="#ec3818", text='Quit', command=self.quit)
+        self.quitButton = tk.Button(self, bg=QConfiguration.color, text='Quit', command=self.quit)
         self.quitButton.grid(row=r, column=1, sticky=tk.E+tk.W, pady=0)
 
         # Start the clock
