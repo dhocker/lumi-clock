@@ -11,7 +11,7 @@ The clock display takes over the enitre screen. It displays the current time,
 an AM/PM indicator and a spinner (an animated GIF). The time display
 is sized so that it looks good on a tablet sized display (say 7"-8").
 
-![Screen Shot][https://github.com/dhocker/lumi-clock/raw/master/screenshot.png "Screen Shot"]
+![Screen Shot](https://github.com/dhocker/lumi-clock/raw/master/screenshot.png "Screen Shot")
 
 ## Configuration File
 The first time you run LumiClock it creates a default configuration file
