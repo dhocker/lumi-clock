@@ -27,6 +27,7 @@ import glob
 import sys
 from functools import partial
 from animated_gif_label import AnimatedGIFLabel
+from configuration import QConfiguration
 
 
 class LumiClockApplication(tk.Frame):
