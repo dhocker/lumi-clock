@@ -64,8 +64,8 @@ class LumiClockApplication(tk.Frame):
         self._createWidgets()
 
         # Set up escape key as full screen toggle
-        self.master.bind("<Escape>", self._toggle_fullscreen)
-        self._toggle_fullscreen()
+        self.master.bind("<Escape>", self.toggle_fullscreen)
+        self.toggle_fullscreen()
 
         # Capture left mouse double clicks anywhere in the Frame
         self.master.bind("<Double-Button-1>", self.quit_app)
@@ -86,7 +86,7 @@ class LumiClockApplication(tk.Frame):
     def _show_context_menu(self, event):
         self.context_menu.post(event.x_root, event.y_root)
 
-    def _toggle_fullscreen(self, event=None):
+    def toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen  # Just toggling the boolean
         self.master.attributes("-fullscreen", self.fullscreen)
         # Adjust row height for effective size of window
@@ -176,7 +176,7 @@ class LumiClockApplication(tk.Frame):
 
 class ContextMenu(tk.Menu):
     """
-    Context menu for allowing user to choose spinner
+    Context menu for allowing user to interact with the clock
     """
     def __init__(self, parent, **args):
         tk.Menu.__init__(self, **args)
@@ -189,11 +189,23 @@ class ContextMenu(tk.Menu):
             self.add_command(label=g, command=partial(self._new_spinner, g))
 
         self.add_separator()
+        self.add_command(label="Toggle fullscreen", command=self._toggle_fullscreen)
         self.add_command(label="Save configuration", command=QConfiguration.save)
         self.add_command(label="Quit", command=self._quit)
 
+    def _toggle_fullscreen(self):
+        """
+        Toggle screen between fullscreen and window
+        :return:
+        """
+        self.parent.toggle_fullscreen()
+
     def _new_spinner(self, gif):
-        # Change the current spinner to the newly selected GIF
+        """
+        Change the current spinner to the newly selected GIF
+        :param gif:
+        :return:
+        """
         self.parent.change_spinner(gif)
         QConfiguration.spinner = gif
 
