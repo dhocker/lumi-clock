@@ -18,6 +18,12 @@
 import tkinter as tk # In python2 it's Tkinter
 from PIL import Image, ImageTk
 from itertools import count
+from app_logger import AppLogger
+
+
+# Logger init
+the_app_logger = AppLogger("lumiclock")
+logger = the_app_logger.getAppLogger()
 
 
 class AnimatedGIFLabel(tk.Label):
@@ -55,17 +61,17 @@ class AnimatedGIFLabel(tk.Label):
                 im.seek(i)
         except EOFError:
             pass
-        print(len(self.frames), "frames in GIF", im)
+        logger.debug("%d frames in GIF %s", len(self.frames), im)
 
         if not delay:
             try:
                 self.delay = im.info['duration']
-                print("GIF duration:", self.delay)
+                logger.debug("GIF duration: %d", self.delay)
             except:
                 self.delay = 100
         else:
             self.delay = delay
-        print("Delay:", self.delay)
+        logger.debug("Delay: %d", self.delay)
 
         if len(self.frames) == 1:
             self.config(image=self.frames[0])
