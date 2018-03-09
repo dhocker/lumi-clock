@@ -103,7 +103,8 @@ class LumiClockApplication(tk.Frame):
 
     def quit_app(self, event):
         self.run_clock = False
-        self.quit()
+        self.master.destroy()
+        sys.exit(0)
 
     def _createWidgets(self):
         """
@@ -214,6 +215,7 @@ class ContextMenu(tk.Menu):
         Quit app
         :return:
         """
+        self.destroy()
         self.parent.quit_app(None)
 
 
