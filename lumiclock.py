@@ -105,6 +105,7 @@ class LumiClockApplication(tk.Frame):
         self.label["text"] = "clicked at {0} {1}".format(event.x, event.y)
 
     def quit_app(self, event):
+        self.run_clock = False
         self.quit()
 
     def _createWidgets(self):
