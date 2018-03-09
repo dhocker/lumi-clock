@@ -59,16 +59,13 @@ class LumiClockApplication(tk.Frame):
         # Gets rid of title bar, but OS window decorations remain
         # self.master.overrideredirect(True)
         self.grid()
-        #self.columnconfigure(0, minsize=int(self.screen_width / 20))
-        #self.columnconfigure(1, minsize=int(self.screen_width / 10))
         self.rowconfigure(0, minsize=int(self.screen_height / 2))
+
         self._createWidgets()
 
         # Set up escape key as full screen toggle
         self.master.bind("<Escape>", self._toggle_fullscreen)
         self._toggle_fullscreen()
-        #self.master.attributes("-fullscreen", self.fullscreen)
-        # self.master.wm_attributes('-fullscreen', self.fullscreen)
 
         # Capture left mouse double clicks anywhere in the Frame
         self.master.bind("<Double-Button-1>", self.quit_app)
@@ -109,6 +106,10 @@ class LumiClockApplication(tk.Frame):
         self.quit()
 
     def _createWidgets(self):
+        """
+        Create clock and spinner widgets
+        :return:
+        """
         r = 0
 
         self.clockfont = tkfont.Font(family=QConfiguration.font, size=72*3)
@@ -126,7 +127,6 @@ class LumiClockApplication(tk.Frame):
         # http://www.chimply.com/Generator#classic-spinner,animatedTriangles
         # Select default spinner
         self.image_label.load(QConfiguration.spinner)
-        # self.image_label.delay = 160
 
         r += 1
 
@@ -140,10 +140,12 @@ class LumiClockApplication(tk.Frame):
         self._update_clock()
 
     def _update_clock(self):
+        """
+        Run the clock unless we are in the process of quiting
+        :return:
+        """
         if self.run_clock:
-            #current = datetime.datetime.now().strftime("%I:%M")
             now = datetime.datetime.now()
-            # current = now.strftime("%I:%M %p")
             current = now.strftime("%I:%M")
             if now.hour >= 12:
                 current += "."
@@ -163,6 +165,11 @@ class LumiClockApplication(tk.Frame):
             self.after(1000, self._update_clock)
 
     def change_spinner(self, gif):
+        """
+        Change to a new spinner GIF
+        :param gif:
+        :return:
+        """
         print(gif)
         self.image_label.unload()
         self.image_label.load(gif)
