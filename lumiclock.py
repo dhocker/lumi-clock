@@ -46,6 +46,7 @@ class LumiClockApplication(tk.Frame):
         self.master = master
         self.toggle_ampm = True
         self.fullscreen = True
+        self.run_clock = False
 
         # Screen dimensions
         self.screen_width = self.master.winfo_screenwidth()
@@ -134,29 +135,31 @@ class LumiClockApplication(tk.Frame):
         self.quitButton.grid(row=r, column=1, sticky=tk.E+tk.W, pady=0)
 
         # Start the clock
+        self.run_clock = True
         self._update_clock()
 
     def _update_clock(self):
-        #current = datetime.datetime.now().strftime("%I:%M")
-        now = datetime.datetime.now()
-        # current = now.strftime("%I:%M %p")
-        current = now.strftime("%I:%M")
-        if now.hour >= 12:
-            current += "."
-        else:
-            current += " "
-        self.toggle_ampm = not self.toggle_ampm
-        if current[0] == '0':
-            current = " " + current[1:]
-        # HACK to space clock digits and spinner
-        if self.fullscreen:
-            current += " "
-        if self.last_time != current:
-            # How to change the label in code
-            self.textbox["text"] = current
-            self.last_time = current
+        if self.run_clock:
+            #current = datetime.datetime.now().strftime("%I:%M")
+            now = datetime.datetime.now()
+            # current = now.strftime("%I:%M %p")
+            current = now.strftime("%I:%M")
+            if now.hour >= 12:
+                current += "."
+            else:
+                current += " "
+            self.toggle_ampm = not self.toggle_ampm
+            if current[0] == '0':
+                current = " " + current[1:]
+            # HACK to space clock digits and spinner
+            if self.fullscreen:
+                current += " "
+            if self.last_time != current:
+                # How to change the label in code
+                self.textbox["text"] = current
+                self.last_time = current
 
-        self.after(1000, self._update_clock)
+            self.after(1000, self._update_clock)
 
     def change_spinner(self, gif):
         print(gif)
@@ -177,11 +180,14 @@ class ContextMenu(tk.Menu):
             # This is the best way I could find to pass the GIF name to the handler
             self.add_command(label=g, command=partial(self._new_spinner, g))
 
+        self.add_separator()
+        self.add_command(label="Save configuration", command=QConfiguration.save)
         self.add_command(label="Quit", command=self._quit)
 
     def _new_spinner(self, gif):
         # Change the current spinner to the newly selected GIF
         self.parent.change_spinner(gif)
+        QConfiguration.spinner = gif
 
     def _quit(self):
         """
