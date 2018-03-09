@@ -51,7 +51,7 @@ class LumiClockApplication(tk.Frame):
         # Screen dimensions
         self.screen_width = self.master.winfo_screenwidth()
         self.screen_height = self.master.winfo_screenheight()
-        print(self.screen_width, "x", self.screen_height)
+        logger.debug("%d x %d", self.screen_width, self.screen_height)
         geo = "{0}x{1}".format(int(1000), int(self.screen_height / 2))
         self.master.geometry(geo)
         self.master["bg"] = 'black'
