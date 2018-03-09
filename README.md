@@ -47,6 +47,8 @@ that are available and other program actions (like Quit). Any GIF in
 the project directory will be shown on the context menu. Thus, if you
 add your own GIFs they will show on the context menu.
 
+![Screen Shot](https://github.com/dhocker/lumi-clock/raw/master/contextmenu.png "Context Menu")
+
 ## Building a Clock
 TBW
 
