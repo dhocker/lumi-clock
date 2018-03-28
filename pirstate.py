@@ -12,62 +12,27 @@
 # echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power
 #
 
-import RPi.GPIO as GPIO
+from pir_sensor_thread import SensorThread
 import time
-import datetime
 
-pir = 12
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(pir, GPIO.IN)
 
-# states
-display_off = 0
-display_on = 1
-display_count_down = 2
-display_state = display_off
-count_down_time = 60 * 1
-down_counter = 0
+if __name__ == '__main__':
+    print("Press ctrl-C to terminate")
+    threadinst = SensorThread()
+    try:
+        threadinst.start()
+        print(threadinst.name)
+        # Wait until human presses ctrl-C
+        while True:
+            time.sleep(1.0)
+    except KeyboardInterrupt:
+        print()
+        print("Keyboard interrupt")
+    except Exception as ex:
+        print("Unhandled exception")
+        print(ex)
+    finally:
+        print("Terminating sensor thread")
+        threadinst.terminate()
 
-try:
-    change_time = datetime.datetime.now()
-    while True:
-        now = datetime.datetime.now()
-        v = GPIO.input(pir)
-        
-        if display_state == display_off:
-            if v:
-                # new state is on
-                print("Display on")
-                display_state = display_on
-        elif display_state == display_on:
-            if not v:
-                # New state is counting down
-                print("Counting down to display off")
-                down_counter = count_down_time
-                display_state = display_count_down
-        elif display_state == display_count_down:
-            # Counting down to display off
-            down_counter -= 1
-            if down_counter <= 0:
-                # New state is display off
-                print("Display off")
-                display_state = display_off
-            elif v:
-                # New state is display on
-                print("Display on")
-                display_state = display_on
-            else:
-                # Maintain same state
-                pass
-        else:
-            # Unknown state
-            print("Unknown state", display_state)
-        
-        print(display_state)
-        time.sleep(1.0)
-except:
-    print()
-    print("Keyboard interrupt")
-
-print("End")
-
+    print("End")
