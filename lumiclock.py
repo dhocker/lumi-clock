@@ -81,7 +81,7 @@ class LumiClockApplication(tk.Frame):
         self.context_menu = ContextMenu(self)
 
         # Capture left mouse single click anywhere in the Frame
-        self.master.bind("<Button-1>", self._show_context_menu)
+        self.bind("<Button-1>", self._show_context_menu)
 
     def _show_context_menu(self, event):
         self.context_menu.post(event.x_root, event.y_root)
@@ -120,11 +120,13 @@ class LumiClockApplication(tk.Frame):
         # Sets the label text (the clock) statically
         self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg=QConfiguration.color, bg='black')
         self.textbox.grid(row=r, column=0, sticky=tk.W+tk.N+tk.S)
+        self.textbox.bind("<Button-1>", self._show_context_menu)
 
         # image display
         # animated GIF
         self.image_label = AnimatedGIFLabel(bg='black')
         self.image_label.grid(row=r, column=1, sticky=tk.E+tk.N+tk.S)
+        self.image_label.bind("<Button-1>", self._show_context_menu)
         # http://www.chimply.com/Generator#classic-spinner,animatedTriangles
         # Select default spinner
         self.image_label.load(QConfiguration.spinner)
