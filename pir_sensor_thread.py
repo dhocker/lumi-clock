@@ -135,7 +135,7 @@ class SensorThread(threading.Thread):
                 # Unknown state
                 print("Undefined state", self.display_state)
             
-            print("v:", v, "state:", self.display_state)
+            print("v:", v, "state:", self.display_state, "count:", self.down_counter)
             # This is why the sensor monitor runs on its own thread.
             time.sleep(1.0)
         print("Sensor thread terminated")
@@ -179,4 +179,4 @@ class SensorThread(threading.Thread):
             subprocess.check_output(a, shell=True)
     
     def display_count_down(self):
-        print("Counting down to display off")
+        print("Counting down to display off from", self.down_counter)
