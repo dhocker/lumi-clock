@@ -3,7 +3,8 @@ Copyright © 2018 by Dave Hocker
 
 ## Overview
 This project is a relatively simple digital clock app that was inspired
-by the Lumitime clocks of the '70s and '80s. It uses Tkinter for
+by the Lumitime clocks of the '70s and '80s. It uses Python3 and
+Tkinter for
 the GUI and the Pillow package for implementing an animated GIF.
 It was originally conceived as a Raspberry Pi based project.
 
@@ -12,6 +13,10 @@ an AM/PM indicator and a spinner (an animated GIF). The time display
 is sized so that it looks good on a tablet sized display (say 7"-8").
 
 ![Screen Shot](https://github.com/dhocker/lumi-clock/raw/master/screenshot.png "Screen Shot")
+
+The app also supports a PIR motion sensor. This allows the app to turn
+the clock display on or off based on the motion sensor. This allows
+the clock to run 7/24 with reasonable wear on the display.
 
 ## Configuration File
 The first time you run LumiClock it creates a default configuration file
@@ -47,10 +52,29 @@ that are available and other program actions (like Quit). Any GIF in
 the project directory will be shown on the context menu. Thus, if you
 add your own GIFs they will show on the context menu.
 
-![Screen Shot](https://github.com/dhocker/lumi-clock/raw/master/contextmenu.png "Context Menu")
+![Context Menu](https://github.com/dhocker/lumi-clock/raw/master/contextmenu.png "Context Menu")
 
 ## Building a Clock
-TBW
+TBD - picture of finished project
+### Hardware
+#### BOM
+* Display: [Adafruit 7" touchscreen][Display]
+* Raspberry Pi: Model 3B or 3B+ (with WiFi)
+* PIR sensor: [Adafruit PIR motion sensor][PIRSensor]
+* SDcard: 8GB or larger
+
+#### Wiring Diagram
+
+![Wiring Diagram](https://github.com/dhocker/lumi-clock/raw/master/LumiClock%20Wiring%20Diagram.png "Wiring Diagram")
+
+### Software
+#### BOM
+* OS: Raspbian Stretch
+* Python3: Version >= 3.5
+* Tkinter: Version >= 8.6
+* Pillow: Version >= 5.0
+
+#### Setup
 
 ## References
 * [Example](https://www.youtube.com/watch?v=hhVlHwHnsEg) - examples of
@@ -59,6 +83,8 @@ Lumitime clocks.
 some of the story behind the Lumitime clock.
 * [Display](https://www.adafruit.com/product/2718) - an 800x480 touchscreen
 that can be combined with a Raspberry Pi to build a clock.
+* [PIRSensor](https://adafruit.com/product/189) - an inexpensive module
+that is easy to use.
 * [Digital Font](https://www.dafont.com/digital-7.font) - a nice digital (7 segment)
 font.
 * [Chimply](http://www.chimply.com/Generator) - a good site for generating
