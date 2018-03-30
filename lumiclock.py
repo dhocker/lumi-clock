@@ -29,7 +29,6 @@ from functools import partial
 from animated_gif_label import AnimatedGIFLabel
 from configuration import QConfiguration
 from app_logger import AppLogger
-from pir_sensor_thread import SensorThread
 
 
 # Logger init
@@ -223,8 +222,10 @@ class ContextMenu(tk.Menu):
 
 if __name__ == '__main__':
     # Start the PIR sensor monitor
-    threadinst = SensorThread()
-    threadinst.start()
+    if QConfiguration.pirsensor:
+        from pir_sensor_thread import SensorThread
+        threadinst = SensorThread(count_down_time=QConfiguration.timeout * 60)
+        threadinst.start()
     
     # Create main window and run the event loop
     root = tk.Tk()
@@ -233,4 +234,5 @@ if __name__ == '__main__':
     app.mainloop()
 
     # Terminate sensor monitor
-    threadinst.terminate()
+    if QConfiguration.pirsensor:
+        threadinst.terminate()

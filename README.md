@@ -37,6 +37,13 @@ default is "spiral_triangles.gif". There are a number of GIF files
 in the project directory.
 * loglevel: Selects the level of logging (debug, warning, info, error)
 The default is "debug".
+* pirsensor: Determines if a PIR motion sensor is present. Use a
+value of "True", "on" or 1 to indicate one is present. Use "False",
+"off" or 0 otherwise. This setting allows you to run LumiClock on
+a Raspberry Pi without a PIR sensor.
+* timeout: Sets the display timeout value in minutes. This is only
+meaningful if you have a PIR motion sensor. This is how long the
+display will stay on once the PIR sensor indicates no motion.
 
 ## Spinner
 The spinner is a 128x128 animated GIF. The project includes several

@@ -37,6 +37,8 @@ class QConfiguration:
     spinner = "spiral_triangles.gif"
     color = "#EC3818"
     loglevel = "debug"
+    pirsensor = False
+    timeout = 15
     cwd = ""
     conf_exists = False
 
@@ -70,6 +72,16 @@ class QConfiguration:
                 cls.spinner = cfj["spinner"]
             if "color" in cfj:
                 cls.color = cfj["color"]
+            if "pirsensor" in cfj:
+                if cfj["pirsensor"].lower() in ["true", "on", "1"]:
+                    cls.pirsensor = True
+                else:
+                    cls.pirsensor = False
+            if "timeout" in cfj:
+                try:
+                    cls.timeout = int(cfj["timeout"])
+                except:
+                    logger.error("Invalid configuration value to timeout: %s", cfj["timeout"])
             cf.close()
             cls.conf_exists = True
         except FileNotFoundError as ex:
@@ -106,6 +118,8 @@ class QConfiguration:
         conf["font"] = cls.font
         conf["color"] = cls.color
         conf["spinner"] = cls.spinner
+        conf["pirsensor"] = str(cls.pirsensor)
+        conf["timeout"] = cls.timeout
 
         logger.debug("Saving configuration to %s", cls.full_file_path)
         cf = open(cls.full_file_path, "w")
