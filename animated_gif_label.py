@@ -32,8 +32,8 @@ class AnimatedGIFLabel(tk.Label):
         Adapted from the following SO article
         https://stackoverflow.com/questions/43770847/play-an-animated-gif-in-python-with-tkinter
     """
-    def __init__(self, **args):
-        tk.Label.__init__(self, **args)
+    def __init__(self, parent, **args):
+        tk.Label.__init__(self, parent, **args)
         self.loc = 0
         self.im = None
         self.frames = []

@@ -56,7 +56,7 @@ class LumiClockApplication(tk.Frame):
 
         # Gets rid of title bar, but OS window decorations remain
         # self.master.overrideredirect(True)
-        self.grid()
+        self.pack(fill=tk.BOTH, expand=1)
 
         self._createWidgets()
 
@@ -83,10 +83,10 @@ class LumiClockApplication(tk.Frame):
         self.master.attributes("-fullscreen", self.fullscreen)
         # Adjust row height for effective size of window
         # The goal is to get the clock vertically centered
-        if self.fullscreen:
-            self.rowconfigure(0, minsize=int(self.screen_height))
-        else:
-            self.rowconfigure(0, minsize=int(self.screen_height / 2))
+        # if self.fullscreen:
+        #     self.rowconfigure(0, minsize=int(self.screen_height))
+        # else:
+        #     self.rowconfigure(0, minsize=int(self.screen_height / 2))
         # self._update_clock()
         return "break"
 
@@ -101,7 +101,6 @@ class LumiClockApplication(tk.Frame):
         """
         r = 0
         # Fonst size needs to be in config
-        # self.clockfont = tkfont.Font(family=QConfiguration.font, size=72*2)
         # Font size in pixels
         font_size = -int((self.screen_height) * 0.45)
         self.clockfont = tkfont.Font(family=QConfiguration.font, size=font_size)
@@ -110,13 +109,13 @@ class LumiClockApplication(tk.Frame):
 
         # Sets the label text (the clock) statically
         self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg=QConfiguration.color, bg='black')
-        self.textbox.grid(row=r, column=0, sticky=tk.W+tk.N+tk.S)
+        self.textbox.place(x=0, rely=0.25, height=-font_size)
         self.textbox.bind("<Button-1>", self._show_context_menu)
 
         # image display
         # animated GIF
-        self.image_label = AnimatedGIFLabel(bg='black')
-        self.image_label.grid(row=r, column=1, sticky=tk.E+tk.N+tk.S)
+        self.image_label = AnimatedGIFLabel(self, bg='black')
+        self.image_label.place(relx=1, x=-128, rely=0.5, width=128, height=128, anchor=tk.CENTER)
         self.image_label.bind("<Button-1>", self._show_context_menu)
         # http://www.chimply.com/Generator#classic-spinner,animatedTriangles
         # Select default spinner
@@ -164,8 +163,8 @@ class ContextMenu(tk.Menu):
     """
     Context menu for allowing user to interact with the clock
     """
-    def __init__(self, parent, **args):
-        tk.Menu.__init__(self, **args)
+    def __init__(self, parent, tearoff=0, **args):
+        tk.Menu.__init__(self, parent, tearoff=tearoff, **args)
         self.parent = parent
 
         # Create a context menu item for each available GIF
