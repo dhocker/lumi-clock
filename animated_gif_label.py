@@ -54,6 +54,7 @@ class AnimatedGIFLabel(tk.Label):
 
         self.frames = []
         self.loc = 0
+        self.width, self.height = im.size
 
         try:
             for i in count(1):
