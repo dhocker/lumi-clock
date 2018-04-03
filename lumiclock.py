@@ -14,10 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program (the LICENSE.md file).  If not, see <http://www.gnu.org/licenses/>.
 #
-# TODO Need some sort of configuration file to define default behavior
-#   Default GIF
-#   Default font
-#
 
 
 import tkinter as tk # In python2 it's Tkinter
@@ -45,38 +41,30 @@ class LumiClockApplication(tk.Frame):
         self.last_time = ""
         self.master = master
         self.toggle_ampm = True
-        self.fullscreen = True
+        self.fullscreen = False
         self.run_clock = False
+        self.context_menu_active = False
 
         # Screen dimensions
         self.screen_width = self.master.winfo_screenwidth()
         self.screen_height = self.master.winfo_screenheight()
         logger.debug("%d x %d", self.screen_width, self.screen_height)
-        geo = "{0}x{1}".format(int(1000), int(self.screen_height / 2))
+        geo = "{0}x{1}".format(self.screen_width, self.screen_height)
+        logger.debug("Geometry: %s", geo)
         self.master.geometry(geo)
         self.master["bg"] = 'black'
 
         # Gets rid of title bar, but OS window decorations remain
         # self.master.overrideredirect(True)
         self.grid()
-        self.rowconfigure(0, minsize=int(self.screen_height / 2))
 
         self._createWidgets()
 
         # Set up escape key as full screen toggle
         self.master.bind("<Escape>", self.toggle_fullscreen)
-        self.toggle_fullscreen()
 
-        # Capture left mouse double clicks anywhere in the Frame
-        self.master.bind("<Double-Button-1>", self.quit_app)
-        # The right mouse button is OS dependendent
-        # Capture right mouse clicks
-        if sys.platform.startswith('darwin'):
-            # On macOS button 2 is the right button
-            self.master.bind("<Button-2>", self._click_handler)
-        else:
-            # On other systems button 3 is the right button
-            self.master.bind("<Button-3>", self._click_handler)
+        # This show set the display to full screen
+        self.toggle_fullscreen()
 
         self.context_menu = ContextMenu(self)
 
@@ -84,7 +72,11 @@ class LumiClockApplication(tk.Frame):
         self.bind("<Button-1>", self._show_context_menu)
 
     def _show_context_menu(self, event):
-        self.context_menu.post(event.x_root, event.y_root)
+        if not self.context_menu_active:
+            self.context_menu.post(event.x_root, event.y_root)
+        else:
+            self.context_menu.unpost()
+        self.context_menu_active = not self.context_menu_active
 
     def toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen  # Just toggling the boolean
@@ -95,11 +87,8 @@ class LumiClockApplication(tk.Frame):
             self.rowconfigure(0, minsize=int(self.screen_height))
         else:
             self.rowconfigure(0, minsize=int(self.screen_height / 2))
-        self._update_clock()
+        # self._update_clock()
         return "break"
-
-    def _click_handler(self, event):
-        self.label["text"] = "clicked at {0} {1}".format(event.x, event.y)
 
     def quit_app(self, event):
         self.run_clock = False
@@ -111,8 +100,11 @@ class LumiClockApplication(tk.Frame):
         :return:
         """
         r = 0
-
-        self.clockfont = tkfont.Font(family=QConfiguration.font, size=72*3)
+        # Fonst size needs to be in config
+        # self.clockfont = tkfont.Font(family=QConfiguration.font, size=72*2)
+        # Font size in pixels
+        font_size = -int((self.screen_height) * 0.45)
+        self.clockfont = tkfont.Font(family=QConfiguration.font, size=font_size)
         logger.debug(self.clockfont.actual())
         logger.debug(self.clockfont.metrics())
 
@@ -129,14 +121,6 @@ class LumiClockApplication(tk.Frame):
         # http://www.chimply.com/Generator#classic-spinner,animatedTriangles
         # Select default spinner
         self.image_label.load(QConfiguration.spinner)
-
-        r += 1
-
-        self.label = tk.Label(self, text="Quit label:", bg=QConfiguration.color)
-        self.label.grid(row=r, column=0, sticky=tk.W)
-        self.quitButton = tk.Button(self, bg=QConfiguration.color, text='Quit', command=self.quit)
-        self.quitButton.grid(row=r, column=1, sticky=tk.E+tk.W, pady=0)
-
         # Start the clock
         self.run_clock = True
         self._update_clock()
@@ -157,8 +141,8 @@ class LumiClockApplication(tk.Frame):
             if current[0] == '0':
                 current = " " + current[1:]
             # HACK to space clock digits and spinner
-            if self.fullscreen:
-                current += " "
+            # if self.fullscreen:
+            #     current += " "
             if self.last_time != current:
                 # How to change the label in code
                 self.textbox["text"] = current
