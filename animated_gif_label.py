@@ -40,6 +40,8 @@ class AnimatedGIFLabel(tk.Label):
         self.delay = 100
         self.config(pady=0)
         self.running = False
+        self.width = 0
+        self.height = 0
 
     def load(self, im, delay=None):
         """

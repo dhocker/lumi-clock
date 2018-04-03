@@ -81,13 +81,6 @@ class LumiClockApplication(tk.Frame):
     def toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen  # Just toggling the boolean
         self.master.attributes("-fullscreen", self.fullscreen)
-        # Adjust row height for effective size of window
-        # The goal is to get the clock vertically centered
-        # if self.fullscreen:
-        #     self.rowconfigure(0, minsize=int(self.screen_height))
-        # else:
-        #     self.rowconfigure(0, minsize=int(self.screen_height / 2))
-        # self._update_clock()
         return "break"
 
     def quit_app(self, event):
@@ -115,11 +108,11 @@ class LumiClockApplication(tk.Frame):
         # image display
         # animated GIF
         self.image_label = AnimatedGIFLabel(self, bg='black')
-        self.image_label.place(relx=1, x=-128, rely=0.5, width=128, height=128, anchor=tk.CENTER)
-        self.image_label.bind("<Button-1>", self._show_context_menu)
         # http://www.chimply.com/Generator#classic-spinner,animatedTriangles
         # Select default spinner
         self.image_label.load(QConfiguration.spinner)
+        self.image_label.place(relx=1, x=-self.image_label.width, rely=0.5, anchor=tk.CENTER)
+        self.image_label.bind("<Button-1>", self._show_context_menu)
         # Start the clock
         self.run_clock = True
         self._update_clock()
