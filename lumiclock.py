@@ -168,7 +168,9 @@ class ContextMenu(tk.Menu):
 
         self.add_separator()
         self.add_command(label="Toggle fullscreen", command=self._toggle_fullscreen)
+        self.add_separator()
         self.add_command(label="Save configuration", command=QConfiguration.save)
+        self.add_separator()
         self.add_command(label="Quit", command=self._quit)
 
     def _toggle_fullscreen(self):
