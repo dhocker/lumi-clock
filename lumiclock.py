@@ -43,7 +43,6 @@ class LumiClockApplication(tk.Frame):
         self.toggle_ampm = True
         self.fullscreen = False
         self.run_clock = False
-        self.context_menu_active = False
 
         # Screen dimensions
         self.screen_width = self.master.winfo_screenwidth()
@@ -53,7 +52,10 @@ class LumiClockApplication(tk.Frame):
         logger.debug("Geometry: %s", geo)
         self.master.geometry(geo)
         self.master["bg"] = 'black'
-        
+
+        # Font size in pixels
+        self.font_size = -int((self.screen_height) * 0.45)
+
         # This trick hides the cursor
         self.master.config(cursor="none")
 
@@ -75,11 +77,7 @@ class LumiClockApplication(tk.Frame):
         self.bind("<Button-1>", self._show_context_menu)
 
     def _show_context_menu(self, event):
-        if not self.context_menu_active:
-            self.context_menu.post(event.x_root, event.y_root)
-        else:
-            self.context_menu.unpost()
-        self.context_menu_active = not self.context_menu_active
+        self.context_menu.post(event.x_root, event.y_root)
 
     def toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen  # Just toggling the boolean
@@ -96,16 +94,14 @@ class LumiClockApplication(tk.Frame):
         :return:
         """
         r = 0
-        # Fonst size needs to be in config
-        # Font size in pixels
-        font_size = -int((self.screen_height) * 0.45)
-        self.clockfont = tkfont.Font(family=QConfiguration.font, size=font_size)
+        # Font size needs to be in config
+        self.clockfont = tkfont.Font(family=QConfiguration.font, size=self.font_size)
         logger.debug(self.clockfont.actual())
         logger.debug(self.clockfont.metrics())
 
         # Sets the label text (the clock) statically
         self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg=QConfiguration.color, bg='black')
-        self.textbox.place(x=0, rely=0.25, height=-font_size)
+        self.textbox.place(x=0, rely=0.25, height=-self.font_size)
         self.textbox.bind("<Button-1>", self._show_context_menu)
 
         # image display
@@ -151,9 +147,55 @@ class LumiClockApplication(tk.Frame):
         :param gif:
         :return:
         """
-        print(gif)
         self.image_label.unload()
         self.image_label.load(gif)
+        logger.debug("Spinner changed: %s", gif)
+
+    def change_font(self, font_name):
+        self.clockfont = tkfont.Font(family=font_name, size=self.font_size)
+        self.textbox.config(font=self.clockfont)
+        logger.debug("Font changed: %s", font_name)
+
+class SpinnerMenu(tk.Menu):
+    """
+    Menu containing a list of all available spinner GIFs
+    """
+    def __init__(self, parent, command=None, **args):
+        """
+
+        :param parent: Parent of this menu
+        :param command: Callback when a spinner GIF is selected.
+        :param args:
+        """
+        tk.Menu.__init__(self, **args)
+        self.parent = parent
+
+        # Create a context menu item for each available GIF
+        gifs = glob.glob("*.gif")
+        gifs.sort()
+        for g in gifs:
+            # This is the best way I could find to pass the GIF name to the handler
+            self.add_command(label=g, command=partial(command, g))
+
+
+class FontMenu(tk.Menu):
+    """
+    Menu containing a list of all available fonts
+    """
+    def __init__(self, parent, command=None, **args):
+        """
+
+        :param parent:
+        :param command: Callback when a font is selected
+        :param args:
+        """
+        tk.Menu.__init__(self, **args)
+        self.parent = parent
+
+        fonts = list(tkfont.families())
+        fonts.sort()
+        for item in fonts:
+            self.add_command(label=item, command=partial(command, item))
 
 class ContextMenu(tk.Menu):
     """
@@ -163,11 +205,11 @@ class ContextMenu(tk.Menu):
         tk.Menu.__init__(self, parent, tearoff=tearoff, **args)
         self.parent = parent
 
-        # Create a context menu item for each available GIF
-        gifs = glob.glob("*.gif")
-        for g in gifs:
-            # This is the best way I could find to pass the GIF name to the handler
-            self.add_command(label=g, command=partial(self._new_spinner, g))
+        self.spinner_menu = SpinnerMenu(self, command=self._new_spinner)
+        self.add_cascade(label="Spinners", menu=self.spinner_menu)
+
+        self.font_menu = FontMenu(self, command=self._new_font)
+        self.add_cascade(label="Fonts", menu=self.font_menu)
 
         self.add_separator()
         self.add_command(label="Toggle fullscreen", command=self._toggle_fullscreen)
@@ -191,6 +233,10 @@ class ContextMenu(tk.Menu):
         """
         self.parent.change_spinner(gif)
         QConfiguration.spinner = gif
+
+    def _new_font(self, font_name):
+        self.parent.change_font(font_name)
+        QConfiguration.font = font_name
 
     def _quit(self):
         """
