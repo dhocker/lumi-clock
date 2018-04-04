@@ -77,7 +77,8 @@ class LumiClockApplication(tk.Frame):
         self.bind("<Button-1>", self._show_context_menu)
 
     def _show_context_menu(self, event):
-        self.context_menu.post(event.x_root, event.y_root)
+        # self.context_menu.post(event.x_root, event.y_root)
+        self.context_menu.post(event.x_root, 0)
 
     def toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen  # Just toggling the boolean
@@ -167,7 +168,7 @@ class SpinnerMenu(tk.Menu):
         :param command: Callback when a spinner GIF is selected.
         :param args:
         """
-        tk.Menu.__init__(self, **args)
+        tk.Menu.__init__(self, parent, **args)
         self.parent = parent
 
         # Create a context menu item for each available GIF
@@ -189,7 +190,7 @@ class FontMenu(tk.Menu):
         :param command: Callback when a font is selected
         :param args:
         """
-        tk.Menu.__init__(self, **args)
+        tk.Menu.__init__(self, parent, **args)
         self.parent = parent
 
         fonts = list(tkfont.families())
