@@ -53,6 +53,9 @@ class LumiClockApplication(tk.Frame):
         logger.debug("Geometry: %s", geo)
         self.master.geometry(geo)
         self.master["bg"] = 'black'
+        
+        # This trick hides the cursor
+        self.master.config(cursor="none")
 
         # Gets rid of title bar, but OS window decorations remain
         # self.master.overrideredirect(True)
