@@ -48,7 +48,7 @@ class LumiClockApplication(tk.Frame):
         self.screen_width = self.master.winfo_screenwidth()
         self.screen_height = self.master.winfo_screenheight()
         logger.debug("%d x %d", self.screen_width, self.screen_height)
-        geo = "{0}x{1}-0-10".format(self.screen_width, self.screen_height)
+        geo = "{0}x{1}".format(self.screen_width, self.screen_height)
         logger.debug("Geometry: %s", geo)
         self.master.geometry(geo)
         self.master["bg"] = 'black'
@@ -59,8 +59,7 @@ class LumiClockApplication(tk.Frame):
         # This trick hides the cursor
         self.master.config(cursor="none")
 
-        # Gets rid of title bar, but OS window decorations remain
-        # self.master.overrideredirect(True)
+        # Fill the whole window
         self.pack(fill=tk.BOTH, expand=1)
 
         self._createWidgets()
@@ -71,14 +70,16 @@ class LumiClockApplication(tk.Frame):
         # This show set the display to full screen
         self.toggle_fullscreen()
 
-        self.context_menu = ContextMenu(self)
+        self.context_menu = ContextMenu(self, height=self.screen_height)
 
         # Capture left mouse single click anywhere in the Frame
         self.bind("<Button-1>", self._show_context_menu)
 
     def _show_context_menu(self, event):
-        # self.context_menu.post(event.x_root, event.y_root)
+        # Always position context menu at the top so there is maximum
+        # amount of screen for submenus.
         self.context_menu.post(event.x_root, 0)
+        return "break"
 
     def toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen  # Just toggling the boolean
@@ -161,63 +162,78 @@ class SpinnerMenu(tk.Menu):
     """
     Menu containing a list of all available spinner GIFs
     """
-    def __init__(self, parent, command=None, **args):
+    def __init__(self, parent, command=None, height=20, **args):
         """
 
         :param parent: Parent of this menu
         :param command: Callback when a spinner GIF is selected.
         :param args:
         """
-        tk.Menu.__init__(self, parent, **args)
+        tk.Menu.__init__(self, parent, tearoff=0, **args)
         self.parent = parent
+
+        menu_font = tkfont.Font(family="", size=11)
+        line_height = menu_font.metrics("linespace") + menu_font.metrics("ascent") + menu_font.metrics("descent")
+        max_menu_count = int(height / line_height)
 
         # Create a context menu item for each available GIF
         gifs = glob.glob("*.gif")
         gifs.sort()
         for g in gifs:
             # This is the best way I could find to pass the GIF name to the handler
-            self.add_command(label=g, command=partial(command, g))
+            self.add_command(label=g, font=menu_font, command=partial(command, g))
 
 
 class FontMenu(tk.Menu):
     """
     Menu containing a list of all available fonts
     """
-    def __init__(self, parent, command=None, **args):
+    def __init__(self, parent, command=None, height=20, **args):
         """
 
         :param parent:
         :param command: Callback when a font is selected
         :param args:
         """
-        tk.Menu.__init__(self, parent, **args)
+        tk.Menu.__init__(self, parent, tearoff=0, **args)
         self.parent = parent
+
+        menu_font = tkfont.Font(family="", size=11)
+        line_height = menu_font.metrics("linespace") + menu_font.metrics("ascent") + menu_font.metrics("descent")
+        max_menu_count = int(height / line_height)
 
         fonts = list(tkfont.families())
         fonts.sort()
+        count = max_menu_count
         for item in fonts:
-            self.add_command(label=item, command=partial(command, item))
+            if count <= 0:
+                self.add_command(label=item, font=menu_font, command=partial(command, item), columnbreak=True)
+                count = max_menu_count
+            else:
+                self.add_command(label=item, font=menu_font, command=partial(command, item))
+            count -= 1
 
 class ContextMenu(tk.Menu):
     """
     Context menu for allowing user to interact with the clock
     """
-    def __init__(self, parent, tearoff=0, **args):
+    def __init__(self, parent, tearoff=0, height=20, **args):
         tk.Menu.__init__(self, parent, tearoff=tearoff, **args)
         self.parent = parent
+        menu_font = tkfont.Font(family="", size=11)
 
-        self.spinner_menu = SpinnerMenu(self, command=self._new_spinner)
-        self.add_cascade(label="Spinners", menu=self.spinner_menu)
+        self.spinner_menu = SpinnerMenu(self, height=height, command=self._new_spinner)
+        self.add_cascade(label="Spinners", menu=self.spinner_menu, font=menu_font)
 
-        self.font_menu = FontMenu(self, command=self._new_font)
-        self.add_cascade(label="Fonts", menu=self.font_menu)
+        self.font_menu = FontMenu(self, command=self._new_font, height=height)
+        self.add_cascade(label="Fonts", menu=self.font_menu, font=menu_font)
 
         self.add_separator()
-        self.add_command(label="Toggle fullscreen", command=self._toggle_fullscreen)
+        self.add_command(label="Toggle fullscreen", command=self._toggle_fullscreen, font=menu_font)
         self.add_separator()
-        self.add_command(label="Save configuration", command=QConfiguration.save)
+        self.add_command(label="Save configuration", command=QConfiguration.save, font=menu_font)
         self.add_separator()
-        self.add_command(label="Quit", command=self._quit)
+        self.add_command(label="Quit", command=self._quit, font=menu_font)
 
     def _toggle_fullscreen(self):
         """
