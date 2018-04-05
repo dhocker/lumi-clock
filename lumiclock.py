@@ -20,8 +20,8 @@ import tkinter as tk # In python2 it's Tkinter
 from tkinter import font as tkfont, messagebox
 import datetime
 import glob
-import sys
 from functools import partial
+import os
 from animated_gif_label import AnimatedGIFLabel
 from configuration import QConfiguration
 from app_logger import AppLogger
@@ -274,12 +274,21 @@ if __name__ == '__main__':
         from pir_sensor_thread import SensorThread
         threadinst = SensorThread(count_down_time=QConfiguration.timeout * 60)
         threadinst.start()
-    
+
     # Create main window and run the event loop
     root = tk.Tk()
     app = LumiClockApplication(master=root)
-    app.master.title('LumiClock')
-    app.mainloop()
+    root.title('LumiClock')
+    
+    # Set up icon
+    if os.name == "posix":
+        # Linux or OS X
+        root.iconbitmap("lumiclock.xbm")
+    elif os.name == "nt":
+        # Windows
+        root.iconbitmap("lumiclock.ico")
+
+    root.mainloop()
 
     # Terminate sensor monitor
     if QConfiguration.pirsensor:
