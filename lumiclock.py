@@ -17,7 +17,7 @@
 
 
 import tkinter as tk # In python2 it's Tkinter
-from tkinter import font as tkfont
+from tkinter import font as tkfont, messagebox
 import datetime
 import glob
 import sys
@@ -231,7 +231,7 @@ class ContextMenu(tk.Menu):
         self.add_separator()
         self.add_command(label="Toggle fullscreen", command=self._toggle_fullscreen, font=menu_font)
         self.add_separator()
-        self.add_command(label="Save configuration", command=QConfiguration.save, font=menu_font)
+        self.add_command(label="Save configuration", command=self._save_configuration, font=menu_font)
         self.add_separator()
         self.add_command(label="Quit", command=self._quit, font=menu_font)
 
@@ -254,6 +254,10 @@ class ContextMenu(tk.Menu):
     def _new_font(self, font_name):
         self.parent.change_font(font_name)
         QConfiguration.font = font_name
+
+    def _save_configuration(self):
+        QConfiguration.save()
+        messagebox.showinfo("Save Configuration", "The current configuration has been saved")
 
     def _quit(self):
         """
