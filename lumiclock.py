@@ -279,14 +279,17 @@ if __name__ == '__main__':
     root = tk.Tk()
     app = LumiClockApplication(master=root)
     root.title('LumiClock')
-    
+
     # Set up icon
-    if os.name == "posix":
-        # Linux or OS X
-        root.iconbitmap("lumiclock.xbm")
-    elif os.name == "nt":
-        # Windows
-        root.iconbitmap("lumiclock.ico")
+    try:
+        if os.name == "posix":
+            # Linux or OS X
+            root.iconbitmap("lumiclock.xbm")
+        elif os.name == "nt":
+            # Windows
+            root.iconbitmap("lumiclock.ico")
+    except:
+        pass
 
     root.mainloop()
 
