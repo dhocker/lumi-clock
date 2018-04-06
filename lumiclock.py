@@ -285,11 +285,14 @@ if __name__ == '__main__':
         if os.name == "posix":
             # Linux or OS X
             root.iconbitmap("lumiclock.xbm")
+            logger.debug("Loaded icon lumiclock.xbm")
         elif os.name == "nt":
             # Windows
             root.iconbitmap("lumiclock.ico")
-    except:
-        pass
+            logger.debug("Loaded icon lumiclock.ico")
+    except Exception as ex:
+        logger.error(ex.message)
+        logger.error(str(ex))
 
     root.mainloop()
 
