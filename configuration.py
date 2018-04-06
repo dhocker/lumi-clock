@@ -39,6 +39,7 @@ class QConfiguration:
     loglevel = "debug"
     pirsensor = False
     timeout = 15
+    debugdisplay = True
     cwd = ""
     conf_exists = False
 
@@ -82,6 +83,8 @@ class QConfiguration:
                     cls.timeout = int(cfj["timeout"])
                 except:
                     logger.error("Invalid configuration value to timeout: %s", cfj["timeout"])
+            if "debugdisplay" in cfj:
+                cls.debugdisplay = cfj["debugdisplay"].lower() in ["true", "on", "1"]
             cf.close()
             cls.conf_exists = True
         except FileNotFoundError as ex:
@@ -120,6 +123,7 @@ class QConfiguration:
         conf["spinner"] = cls.spinner
         conf["pirsensor"] = str(cls.pirsensor)
         conf["timeout"] = cls.timeout
+        conf["debugdisplay"] = str(cls.debugdisplay)
 
         logger.debug("Saving configuration to %s", cls.full_file_path)
         cf = open(cls.full_file_path, "w")

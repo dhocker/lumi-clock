@@ -32,8 +32,10 @@ logger = the_app_logger.getAppLogger()
 
 class LumiClockApplication(tk.Frame):
     """
-    Main window of the application
+    Main window of the application. Designed to be a singleton.
     """
+    pir_sensor = 0
+    count_down = 0
     def __init__(self, master=None):
         tk.Frame.__init__(self, master, bg='black')
         self.last_time = ""
@@ -112,6 +114,21 @@ class LumiClockApplication(tk.Frame):
         self.image_label.load(QConfiguration.spinner)
         self.image_label.place(relx=1, x=-self.image_label.width, rely=0.5, anchor=tk.CENTER)
         self.image_label.bind("<Button-1>", self._show_context_menu)
+
+        if QConfiguration.debugdisplay:
+            self.debugfont = tkfont.Font(family='Helvetica', size=-20)
+
+            sensor_text = "PIR Sensor: {0}".format(LumiClockApplication.pir_sensor)
+            self.sensor_status = tk.Label(self, text=sensor_text, font=self.debugfont,
+                                          fg=QConfiguration.color, bg='black')
+            self.sensor_status.place(relx=0.5, x=-(self.debugfont.measure("PIR Sensor: ?") + 50), rely=1.0,
+                                     y=self.debugfont['size'], anchor=tk.CENTER)
+
+            count_down_text = "Count Down: {0}".format(LumiClockApplication.count_down)
+            self.count_down = tk.Label(self, text=count_down_text, font=self.debugfont,
+                                       fg=QConfiguration.color, bg='black')
+            self.count_down.place(relx=0.5, rely=1.0, y=self.debugfont['size'], anchor=tk.CENTER)
+
         # Start the clock
         self.run_clock = True
         self._update_clock()
@@ -141,6 +158,12 @@ class LumiClockApplication(tk.Frame):
                 # How to change the label in code
                 self.textbox["text"] = current
                 self.last_time = current
+
+            if QConfiguration.debugdisplay:
+                sensor_text = "PIR Sensor: {0}".format(LumiClockApplication.pir_sensor)
+                self.sensor_status["text"] = sensor_text
+                count_down_text = "Count Down: {0}".format(LumiClockApplication.count_down)
+                self.count_down["text"] = count_down_text
 
             self.after(1000, self._update_clock)
 
