@@ -127,7 +127,10 @@ class LumiClockApplication(tk.Frame):
             now = datetime.datetime.now()
             current = now.strftime("%I:%M")
             if now.hour >= 12:
-                current += "."
+                if (now.second % 2) == 0:
+                    current += "."
+                else:
+                    current += " "
             else:
                 current += " "
             self.toggle_ampm = not self.toggle_ampm
