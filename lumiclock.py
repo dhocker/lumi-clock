@@ -56,7 +56,6 @@ def main():
             root.iconbitmap("lumiclock.ico")
             logger.debug("Loaded icon lumiclock.ico")
     except Exception as ex:
-        logger.error(ex.message)
         logger.error(str(ex))
 
     root.mainloop()
