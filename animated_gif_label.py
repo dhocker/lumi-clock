@@ -40,8 +40,8 @@ class AnimatedGIFLabel(tk.Label):
         self.delay = 100
         self.config(pady=0)
         self.running = False
-        self.width = 0
-        self.height = 0
+        self.width = 128
+        self.height = 128
 
     def load(self, im, delay=None):
         """
@@ -52,7 +52,14 @@ class AnimatedGIFLabel(tk.Label):
         """
         self.im = im
         if isinstance(im, str):
-            im = Image.open(im)
+            try:
+                im = Image.open(im)
+            except Exception as ex:
+                # Likely file not found
+                logger.error(ex)
+                logger.error(str(ex))
+                self.running = False
+                return
 
         self.frames = []
         self.loc = 0
