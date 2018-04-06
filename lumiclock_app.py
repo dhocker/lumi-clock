@@ -121,7 +121,7 @@ class LumiClockApplication(tk.Frame):
             sensor_text = "PIR Sensor: {0}".format(LumiClockApplication.pir_sensor)
             self.sensor_status = tk.Label(self, text=sensor_text, font=self.debugfont,
                                           fg=QConfiguration.color, bg='black')
-            self.sensor_status.place(relx=0.5, x=-(self.debugfont.measure("PIR Sensor: ?") + 50), rely=1.0,
+            self.sensor_status.place(relx=0.5, x=-self.debugfont.measure("PIR Sensor: ???"), rely=1.0,
                                      y=self.debugfont['size'], anchor=tk.CENTER)
 
             count_down_text = "Count Down: {0}".format(LumiClockApplication.count_down)
