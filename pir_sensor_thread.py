@@ -136,7 +136,7 @@ class SensorThread(threading.Thread):
                 # Unknown state
                 print("Undefined state", self.display_state)
             
-            LumiClockApplication.sensor_status = v
+            LumiClockApplication.pir_sensor = v
             LumiClockApplication.count_down = self.down_counter
             
             # This is why the sensor monitor runs on its own thread.
