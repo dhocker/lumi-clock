@@ -108,7 +108,7 @@ class LumiClockApplication(tk.Frame):
 
         # Sets the label text (the clock) statically
         self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg=QConfiguration.color, bg='black')
-        self.textbox.place(x=0, y=int((self.screen_height - self.font_size) / 2))
+        self.textbox.place(x=0, y=int((self.screen_height - self.font_size) / 2), height=self.font_size)
         self.textbox.bind("<Button-1>", self._show_context_menu)
 
         # image display
