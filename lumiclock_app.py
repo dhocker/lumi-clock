@@ -56,10 +56,10 @@ class LumiClockApplication(tk.Frame):
 
         # Font size in pixels
         if QConfiguration.fontsize:
-            self.font_size = -QConfiguration.fontsize
+            self.font_size = QConfiguration.fontsize
         else:
             # Default to 45% of screen height
-            self.font_size = -int(0.45 * self.screen_height)
+            self.font_size = int(0.45 * self.screen_height)
 
         # This trick hides the cursor
         self.master.config(cursor="none")
@@ -102,13 +102,13 @@ class LumiClockApplication(tk.Frame):
         """
         r = 0
         # Font size needs to be in config
-        self.clockfont = tkfont.Font(family=QConfiguration.font, size=self.font_size)
+        self.clockfont = tkfont.Font(family=QConfiguration.font, size=-self.font_size)
         logger.debug(self.clockfont.actual())
         logger.debug(self.clockfont.metrics())
 
         # Sets the label text (the clock) statically
         self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg=QConfiguration.color, bg='black')
-        self.textbox.place(x=0, rely=0.25, height=-self.font_size)
+        self.textbox.place(x=0, y=int((self.screen_height - self.font_size) / 2))
         self.textbox.bind("<Button-1>", self._show_context_menu)
 
         # image display
@@ -157,7 +157,7 @@ class LumiClockApplication(tk.Frame):
                 current += " "
             self.toggle_ampm = not self.toggle_ampm
             if current[0] == '0':
-                current = " " + current[1:]
+                current = current[1:]
             # HACK to space clock digits and spinner
             # if self.fullscreen:
             #     current += " "
