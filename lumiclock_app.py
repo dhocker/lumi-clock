@@ -55,7 +55,11 @@ class LumiClockApplication(tk.Frame):
         self.master["bg"] = 'black'
 
         # Font size in pixels
-        self.font_size = -int((self.screen_height) * 0.45)
+        if QConfiguration.fontsize:
+            self.font_size = -QConfiguration.fontsize
+        else:
+            # Default to 45% of screen height
+            self.font_size = -int(0.45 * self.screen_height)
 
         # This trick hides the cursor
         self.master.config(cursor="none")

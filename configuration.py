@@ -34,6 +34,7 @@ class QConfiguration:
     file_path = ""
     full_file_path = ""
     font = "Courier New"
+    fontsize = 0
     spinner = "spiral_triangles.gif"
     color = "#EC3818"
     loglevel = "debug"
@@ -69,6 +70,11 @@ class QConfiguration:
                 cls.loglevel = cfj["loglevel"]
             if "font" in cfj:
                 cls.font = cfj["font"]
+            if "fontsize" in cfj:
+                try:
+                    cls.fontsize = int(cfj["fontsize"])
+                except:
+                    logger.error("Invalid fontsize value: %s", cfj["fontsize"])
             if "spinner" in cfj:
                 cls.spinner = cfj["spinner"]
             if "color" in cfj:
