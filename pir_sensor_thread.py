@@ -132,7 +132,7 @@ class SensorThread(threading.Thread):
                     self.display_on()
                 else:
                     # Maintain same state
-                    pass
+                    self.display_counting_down()
             elif self._display_state == self._state_unknown:
                 if self.sensor_value:
                     self._display_state = self._state_display_on
@@ -188,4 +188,8 @@ class SensorThread(threading.Thread):
         logger.debug("Display turned off")
 
     def display_count_down(self):
-        logger.debug("Counting down to display off from %d", self.down_counter)
+        logger.debug("Starting count down to display off from %d", self.down_counter)
+
+    def display_counting_down(self):
+        if (self.down_counter % 30) == 0:
+            logger.debug("Counting down to display off %d", self.down_counter)
