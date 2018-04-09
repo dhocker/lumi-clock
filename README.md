@@ -29,6 +29,9 @@ The configuration file contains settings for several items.
 * font: The default font is Courier New. A fixed pitch font works best.
 A good mono-space digital font is
 ["Digital-7 Mono"](https://www.dafont.com/digital-7.font).
+* fontsize: Sets the size of the font in pixels. The default is
+(45%) * (screen height). On the Raspberry Pi touchscreen this is
+0.45 * 480 = 216px.
 * color: Sets the foreground color of the font. The default color
 is "#EC3818" which is an approximation of the color of the original
 Lumitime clock's digits. This color does not affect the spinner.
@@ -44,6 +47,11 @@ a Raspberry Pi without a PIR sensor.
 * timeout: Sets the display timeout value in minutes. This is only
 meaningful if you have a PIR motion sensor. This is how long the
 display will stay on once the PIR sensor indicates no motion.
+* debugdisplay: Logs detailed information about display
+management. This is useful for determining if the PIR sensor is
+functioning as expected. Use a
+value of "True", "on" or 1 to enable. Use "False",
+"off" or 0 otherwise.
 
 ## Spinner
 The spinner is a 128x128 animated GIF. The project includes several
