@@ -24,7 +24,13 @@ import RPi.GPIO as GPIO
 import time
 import threading
 import subprocess
-from lumiclock_app import LumiClockApplication
+from app_logger import AppLogger
+
+
+# Logger init
+the_app_logger = AppLogger("lumiclock")
+logger = the_app_logger.getAppLogger()
+
 
 class SensorThread(threading.Thread):
     """
@@ -58,16 +64,19 @@ class SensorThread(threading.Thread):
         GPIO.setup(self.pir_pin, GPIO.IN)
 
         # states
-        self.state_display_off = 0
-        self.state_display_on = 1
-        self.state_display_count_down = 2
-        self.state_unknown = -1
-        self.display_state = self.state_unknown
+        self._state_display_off = 0
+        self._state_display_on = 1
+        self._state_display_count_down = 2
+        self._state_unknown = -1
+        self._display_state = self._state_unknown
 
-        self.count_down_time = count_down_time
+        self._count_down_time = count_down_time
+        self._terminate_thread = False
+
+        # Public properties
         self.down_counter = 0
-        self.terminate_thread = False
-    
+        self.sensor_value = 0
+
     def run(self):
         """
         Override to call the sensor monitoring code
@@ -84,7 +93,7 @@ class SensorThread(threading.Thread):
         # This variable is a simple semaphore. There are no
         # multi-threading issues as the variable is only
         # read on the sensor thread.
-        self.terminate_thread = True
+        self._terminate_thread = True
         self.join()
 
     def run_sensor(self):
@@ -93,55 +102,52 @@ class SensorThread(threading.Thread):
         its own thread.
         """
 
-        while not self.terminate_thread:
+        while not self._terminate_thread:
             # Read the current state of the PIR sensor.
             # 0 = no movement detected
             # 1 = movement detected
-            v = GPIO.input(self.pir_pin)
-            
-            if self.display_state == self.state_display_off:
-                if v:
+            self.sensor_value = GPIO.input(self.pir_pin)
+
+            if self._display_state == self._state_display_off:
+                if self.sensor_value:
                     # new state is on
-                    self.display_state = self.state_display_on
+                    self._display_state = self._state_display_on
                     self.display_on()
-            elif self.display_state == self.state_display_on:
-                if not v:
+            elif self._display_state == self._state_display_on:
+                if not self.sensor_value:
                     # New state is counting down
-                    self.down_counter = self.count_down_time
-                    self.display_state = self.state_display_count_down
+                    self.down_counter = self._count_down_time
+                    self._display_state = self._state_display_count_down
                     self.display_count_down()
-            elif self.display_state == self.state_display_count_down:
+            elif self._display_state == self._state_display_count_down:
                 # Counting down to display off
                 self.down_counter -= 1
                 if self.down_counter <= 0:
                     # New state is display off
-                    self.display_state = self.state_display_off
+                    self._display_state = self._state_display_off
                     self.display_off()
-                elif v:
+                elif self.sensor_value:
                     # New state is display on
-                    self.display_state = self.state_display_on
+                    self._display_state = self._state_display_on
                     self.display_on()
                 else:
                     # Maintain same state
                     pass
-            elif self.display_state == self.state_unknown:
-                if v:
-                    self.display_state = self.state_display_on
+            elif self._display_state == self._state_unknown:
+                if self.sensor_value:
+                    self._display_state = self._state_display_on
                     self.display_on()
                 else:                    
-                    self.down_counter = self.count_down_time
-                    self.display_state = self.state_display_count_down
+                    self.down_counter = self._count_down_time
+                    self._display_state = self._state_display_count_down
                     self.display_count_down()
             else:
                 # Unknown state
-                print("Undefined state", self.display_state)
-            
-            LumiClockApplication.pir_sensor = v
-            LumiClockApplication.count_down = self.down_counter
-            
+                logger.debug("Undefined state", self._display_state)
+
             # This is why the sensor monitor runs on its own thread.
             time.sleep(1.0)
-        print("Sensor thread terminated")
+        logger.debug("Sensor thread terminated")
 
     @staticmethod
     def is_hdmi_display():
@@ -164,22 +170,22 @@ class SensorThread(threading.Thread):
     """
     
     def display_on(self):
-        print("Display on")
         if SensorThread.is_hdmi_display():
             subprocess.run(["vcgencmd", "display_power", "1"])
         else:
             # rpi 7" touchscreen
             a = ["echo", "0", "|", "sudo", "tee", "/sys/class/backlight/rpi_backlight/bl_power"]
             subprocess.check_output(a, shell=True)
+        logger.debug("Display turned on")
             
     def display_off(self):
-        print("Display off")
         if SensorThread.is_hdmi_display():
             subprocess.run(["vcgencmd", "display_power", "0"])
         else:
             # rpi 7" touchscreen
             a = ["echo", "1", "|", "sudo", "tee", "/sys/class/backlight/rpi_backlight/bl_power"]
             subprocess.check_output(a, shell=True)
-    
+        logger.debug("Display turned off")
+
     def display_count_down(self):
-        print("Counting down to display off from", self.down_counter)
+        logger.debug("Counting down to display off from %d", self.down_counter)

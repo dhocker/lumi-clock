@@ -35,6 +35,7 @@ logger = the_app_logger.getAppLogger()
 
 def main():
     # Start the PIR sensor monitor
+    threadinst = None
     if QConfiguration.pirsensor:
         from pir_sensor_thread import SensorThread
         threadinst = SensorThread(count_down_time=QConfiguration.timeout * 60)
@@ -42,7 +43,7 @@ def main():
 
     # Create main window and run the event loop
     root = tk.Tk()
-    app = LumiClockApplication(master=root)
+    app = LumiClockApplication(master=root, sensor=threadinst)
     root.title('LumiClock')
 
     # Set up icon

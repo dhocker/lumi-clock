@@ -36,8 +36,9 @@ class LumiClockApplication(tk.Frame):
     """
     pir_sensor = 0
     count_down = 0
-    def __init__(self, master=None):
+    def __init__(self, master=None, sensor=None):
         tk.Frame.__init__(self, master, bg='black')
+        self._sensor = sensor
         self.last_time = ""
         self.master = master
         self.toggle_ampm = True
@@ -115,19 +116,21 @@ class LumiClockApplication(tk.Frame):
         self.image_label.place(relx=1, x=-self.image_label.width, rely=0.5, anchor=tk.CENTER)
         self.image_label.bind("<Button-1>", self._show_context_menu)
 
-        if QConfiguration.debugdisplay:
+        if QConfiguration.debugdisplay and self._sensor:
             self.debugfont = tkfont.Font(family='Helvetica', size=-20)
 
-            sensor_text = "PIR Sensor: {0}".format(LumiClockApplication.pir_sensor)
+            sensor_text = "PIR Sensor: {0}".format(self._sensor.sensor_value)
             self.sensor_status = tk.Label(self, text=sensor_text, font=self.debugfont,
                                           fg=QConfiguration.color, bg='black')
             self.sensor_status.place(relx=0.5, x=-self.debugfont.measure("PIR Sensor: ???"), rely=1.0,
                                      y=self.debugfont['size'], anchor=tk.CENTER)
 
-            count_down_text = "Count Down: {0}".format(LumiClockApplication.count_down)
+            count_down_text = "Count Down: {0}".format(self._sensor.down_counter)
             self.count_down = tk.Label(self, text=count_down_text, font=self.debugfont,
                                        fg=QConfiguration.color, bg='black')
             self.count_down.place(relx=0.5, rely=1.0, y=self.debugfont['size'], anchor=tk.CENTER)
+        else:
+            logger.debug("Sensor debug display disabled")
 
         # Start the clock
         self.run_clock = True
@@ -159,10 +162,10 @@ class LumiClockApplication(tk.Frame):
                 self.textbox["text"] = current
                 self.last_time = current
 
-            if QConfiguration.debugdisplay:
-                sensor_text = "PIR Sensor: {0}".format(LumiClockApplication.pir_sensor)
+            if QConfiguration.debugdisplay and self._sensor:
+                sensor_text = "PIR Sensor: {0}".format(self._sensor.sensor_value)
                 self.sensor_status["text"] = sensor_text
-                count_down_text = "Count Down: {0}".format(LumiClockApplication.count_down)
+                count_down_text = "Count Down: {0}".format(self._sensor.down_counter)
                 self.count_down["text"] = count_down_text
 
             self.after(1000, self._update_clock)
