@@ -34,8 +34,6 @@ class LumiClockApplication(tk.Frame):
     """
     Main window of the application. Designed to be a singleton.
     """
-    pir_sensor = 0
-    count_down = 0
     def __init__(self, master=None, sensor=None):
         tk.Frame.__init__(self, master, bg='black')
         self._sensor = sensor
