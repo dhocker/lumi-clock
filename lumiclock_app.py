@@ -186,6 +186,7 @@ class LumiClockApplication(tk.Frame):
         # Pick the largest of the size and linespace in an effort to keep
         # the y offset small.
         actual_size = max(self.clockfont.actual()["size"], self.clockfont.metrics()["linespace"])
+        self.textbox.config(height=actual_size)
         self.textbox.place(x=0, y=int((self.screen_height - actual_size) / 2), height=actual_size)
 
         logger.debug("Font changed to: %s", font_name)
