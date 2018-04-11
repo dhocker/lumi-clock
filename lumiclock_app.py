@@ -98,15 +98,9 @@ class LumiClockApplication(tk.Frame):
         Create clock and spinner widgets
         :return:
         """
-        r = 0
-        # Font size needs to be in config
-        self.clockfont = tkfont.Font(family=QConfiguration.font, size=-self.font_size)
-        logger.debug(self.clockfont.actual())
-        logger.debug(self.clockfont.metrics())
-
-        # Sets the label text (the clock) statically
-        self.textbox = tk.Label(self, text="12:00", font=self.clockfont, fg=QConfiguration.color, bg='black')
-        self.textbox.place(x=0, y=int((self.screen_height - self.font_size) / 2), height=self.font_size)
+        # Define the clock widget and its font
+        self.textbox = tk.Label(self, text="12:00", fg=QConfiguration.color, bg='black')
+        self.change_font(QConfiguration.font)
         self.textbox.bind("<Button-1>", self._show_context_menu)
 
         # image display
@@ -156,9 +150,6 @@ class LumiClockApplication(tk.Frame):
             self.toggle_ampm = not self.toggle_ampm
             if current[0] == '0':
                 current = current[1:]
-            # HACK to space clock digits and spinner
-            # if self.fullscreen:
-            #     current += " "
             if self.last_time != current:
                 # How to change the label in code
                 self.textbox["text"] = current
@@ -183,9 +174,24 @@ class LumiClockApplication(tk.Frame):
         logger.debug("Spinner changed: %s", gif)
 
     def change_font(self, font_name):
+        """
+        Change the current clock font. Reposition the clock widget
+        so it appears to be visually centered.
+        :param font_name: The new font family.
+        :return: None.
+        """
         self.clockfont = tkfont.Font(family=font_name, size=self.font_size)
         self.textbox.config(font=self.clockfont)
-        logger.debug("Font changed: %s", font_name)
+
+        # Pick the largest of the size and linespace in an effort to keep
+        # the y offset small.
+        actual_size = max(self.clockfont.actual()["size"], self.clockfont.metrics()["linespace"])
+        self.textbox.place(x=0, y=int((self.screen_height - actual_size) / 2), height=actual_size)
+
+        logger.debug("Font changed to: %s", font_name)
+        logger.debug(self.clockfont.actual())
+        logger.debug(self.clockfont.metrics())
+        logger.debug("Clock widget y = %d", int((self.screen_height - actual_size) / 2))
 
 class SpinnerMenu(tk.Menu):
     """
