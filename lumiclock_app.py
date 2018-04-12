@@ -185,12 +185,18 @@ class LumiClockApplication(tk.Frame):
 
         # Pick the largest of the size and linespace in an effort to keep
         # the y offset small.
-        actual_size = max(self.clockfont.actual()["size"], self.clockfont.metrics()["linespace"])
-        self.textbox.place(x=0, y=int((self.screen_height - actual_size) / 2), height=self.font_size)
+        # The Digital 7 fonts have negative descent values. This throws
+        # positioning out of whack. To compensate, the absolute values
+        # for ascent and descent are used to calculate the practical linespace.
+        linespace = abs(self.clockfont.metrics()["ascent"]) + abs(self.clockfont.metrics()["descent"])
+        actual_size = max(self.clockfont.actual()["size"], linespace)
+        self.textbox.place(x=0, y=int((self.screen_height - actual_size) / 2), height=actual_size)
 
         logger.debug("Font changed to: %s", font_name)
         logger.debug(self.clockfont.actual())
         logger.debug(self.clockfont.metrics())
+        logger.debug("Configured font size: %d", self.font_size)
+        logger.debug("Calculated linespace: %d", linespace)
         logger.debug("Clock widget y = %d", int((self.screen_height - actual_size) / 2))
 
 class SpinnerMenu(tk.Menu):
