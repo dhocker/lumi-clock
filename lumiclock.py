@@ -46,7 +46,7 @@ def main():
 
     # Create main window and run the event loop
     root = tk.Tk()
-    app = LumiClockApplication(master=root, sensor=threadinst)
+    app = LumiClockApplication(master=root, sensor=threadinst, display=display_controller)
     root.title('LumiClock')
 
     # Set up icon

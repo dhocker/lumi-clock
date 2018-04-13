@@ -62,7 +62,6 @@ class SensorThread(threading.Thread):
         self._terminate_thread = False
 
         # Public properties
-        self.down_counter = 0
         self.sensor_value = 0
 
     def run(self):

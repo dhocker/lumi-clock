@@ -34,9 +34,10 @@ class LumiClockApplication(tk.Frame):
     """
     Main window of the application. Designed to be a singleton.
     """
-    def __init__(self, master=None, sensor=None):
+    def __init__(self, master=None, sensor=None, display=None):
         tk.Frame.__init__(self, master, bg='black')
         self._sensor = sensor
+        self._display = display
         self.last_time = ""
         self.master = master
         self.toggle_ampm = True
@@ -158,7 +159,7 @@ class LumiClockApplication(tk.Frame):
             if QConfiguration.debugdisplay and self._sensor:
                 sensor_text = "PIR Sensor: {0}".format(self._sensor.sensor_value)
                 self.sensor_status["text"] = sensor_text
-                count_down_text = "Count Down: {0}".format(self._sensor.down_counter)
+                count_down_text = "Count Down: {0}".format(self._display.down_counter)
                 self.count_down["text"] = count_down_text
 
             self.after(1000, self._update_clock)
