@@ -199,6 +199,19 @@ class LumiClockApplication(tk.Frame):
         logger.debug("Calculated linespace: %d", linespace)
         logger.debug("Clock widget y = %d", int((self.screen_height - actual_size) / 2))
 
+    def larger_font(self):
+        font_name = self.clockfont.actual()["family"]
+        self.font_size = int(self.font_size * 1.1)
+        self.change_font(font_name)
+        return self.font_size
+
+    def smaller_font(self):
+        font_name = self.clockfont.actual()["family"]
+        self.font_size = int(self.font_size * 0.9)
+        self.change_font(font_name)
+        return self.font_size
+
+
 class SpinnerMenu(tk.Menu):
     """
     Menu containing a list of all available spinner GIFs
@@ -266,8 +279,11 @@ class ContextMenu(tk.Menu):
         self.spinner_menu = SpinnerMenu(self, height=height, command=self._new_spinner)
         self.add_cascade(label="Spinners", menu=self.spinner_menu, font=menu_font)
 
+        self.add_separator()
         self.font_menu = FontMenu(self, command=self._new_font, height=height)
         self.add_cascade(label="Fonts", menu=self.font_menu, font=menu_font)
+        self.add_command(label="Larger", command=self._larger_font, font=menu_font)
+        self.add_command(label="Smaller", command=self._smaller_font, font=menu_font)
 
         self.add_separator()
         self.add_command(label="Toggle fullscreen", command=self._toggle_fullscreen, font=menu_font)
@@ -295,6 +311,12 @@ class ContextMenu(tk.Menu):
     def _new_font(self, font_name):
         self.parent.change_font(font_name)
         QConfiguration.font = font_name
+
+    def _larger_font(self):
+        QConfiguration.fontsize = self.parent.larger_font()
+
+    def _smaller_font(self):
+        QConfiguration.fontsize = self.parent.smaller_font()
 
     def _save_configuration(self):
         QConfiguration.save()
