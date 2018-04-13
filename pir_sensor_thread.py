@@ -174,7 +174,8 @@ class SensorThread(threading.Thread):
             subprocess.run(["vcgencmd", "display_power", "1"])
         else:
             # rpi 7" touchscreen
-            a = ["echo", "0", "|", "sudo", "tee", "/sys/class/backlight/rpi_backlight/bl_power"]
+            a = "echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
+            logger.debug(a)
             subprocess.check_output(a, shell=True)
         logger.debug("Display turned on")
             
@@ -183,7 +184,8 @@ class SensorThread(threading.Thread):
             subprocess.run(["vcgencmd", "display_power", "0"])
         else:
             # rpi 7" touchscreen
-            a = ["echo", "1", "|", "sudo", "tee", "/sys/class/backlight/rpi_backlight/bl_power"]
+            a = "echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
+            logger.debug(a)
             subprocess.check_output(a, shell=True)
         logger.debug("Display turned off")
 
