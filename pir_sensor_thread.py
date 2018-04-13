@@ -24,6 +24,7 @@ import RPi.GPIO as GPIO
 import time
 import threading
 import subprocess
+from display_controller import DisplayController
 from app_logger import AppLogger
 
 
@@ -38,16 +39,10 @@ class SensorThread(threading.Thread):
     This class can be used as-is or it can be used as the base
     class for a more customized implementation.
     Reference: http://adafruit/189
-    
-    The PIR sensor is monitored by a state machine.
-    Display off
-    Display on
-    Count down to display off
-    Unknown
-    
+
     The initial state is unknown.
     """
-    def __init__(self, pir_pin=12, count_down_time=60*1, name="PIRSensorThread"):
+    def __init__(self, pir_pin=12, name="PIRSensorThread", notify=None):
         """
         Class constructor.
         pir_pin: board pin number where PIR data line is connected.
@@ -63,14 +58,7 @@ class SensorThread(threading.Thread):
         # Using pin for input only
         GPIO.setup(self.pir_pin, GPIO.IN)
 
-        # states
-        self._state_display_off = 0
-        self._state_display_on = 1
-        self._state_display_count_down = 2
-        self._state_unknown = -1
-        self._display_state = self._state_unknown
-
-        self._count_down_time = count_down_time
+        self._notify_proc = notify
         self._terminate_thread = False
 
         # Public properties
@@ -108,90 +96,9 @@ class SensorThread(threading.Thread):
             # 1 = movement detected
             self.sensor_value = GPIO.input(self.pir_pin)
 
-            if self._display_state == self._state_display_off:
-                if self.sensor_value:
-                    # new state is on
-                    self._display_state = self._state_display_on
-                    self.display_on()
-            elif self._display_state == self._state_display_on:
-                if not self.sensor_value:
-                    # New state is counting down
-                    self.down_counter = self._count_down_time
-                    self._display_state = self._state_display_count_down
-                    self.display_count_down()
-            elif self._display_state == self._state_display_count_down:
-                # Counting down to display off
-                self.down_counter -= 1
-                if self.down_counter <= 0:
-                    # New state is display off
-                    self._display_state = self._state_display_off
-                    self.display_off()
-                elif self.sensor_value:
-                    # New state is display on
-                    self._display_state = self._state_display_on
-                    self.display_on()
-                else:
-                    # Maintain same state
-                    self.display_counting_down()
-            elif self._display_state == self._state_unknown:
-                if self.sensor_value:
-                    self._display_state = self._state_display_on
-                    self.display_on()
-                else:                    
-                    self.down_counter = self._count_down_time
-                    self._display_state = self._state_display_count_down
-                    self.display_count_down()
-            else:
-                # Unknown state
-                logger.debug("Undefined state", self._display_state)
+            if self._notify_proc:
+                self._notify_proc(self.sensor_value)
 
             # This is why the sensor monitor runs on its own thread.
             time.sleep(1.0)
         logger.debug("Sensor thread terminated")
-
-    @staticmethod
-    def is_hdmi_display():
-        """
-        Answers the question: Is the current display HDMI?
-        Otherwise, it is assumed to be the RPi 7" touchscreen.
-        """
-        res = subprocess.run(["tvservice", "-s"], stdout=subprocess.PIPE)
-        res = str(res.stdout, 'utf-8')
-        if res.find("HDMI") != -1:
-            return True
-        return False
-    
-    """
-    These methods can be overriden in a derived class
-    to provide advanced customization of each state.
-    Each method is called when the state is entered.
-    The techniques used to manage diffrent displays was
-    found at: https://scribles.net/controlling-display-backlight-on-raspberry-pi/
-    """
-    
-    def display_on(self):
-        if SensorThread.is_hdmi_display():
-            subprocess.run(["vcgencmd", "display_power", "1"])
-        else:
-            # rpi 7" touchscreen
-            a = "echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
-            logger.debug(a)
-            subprocess.check_output(a, shell=True)
-        logger.debug("Display turned on")
-            
-    def display_off(self):
-        if SensorThread.is_hdmi_display():
-            subprocess.run(["vcgencmd", "display_power", "0"])
-        else:
-            # rpi 7" touchscreen
-            a = "echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
-            logger.debug(a)
-            subprocess.check_output(a, shell=True)
-        logger.debug("Display turned off")
-
-    def display_count_down(self):
-        logger.debug("Starting count down to display off from %d", self.down_counter)
-
-    def display_counting_down(self):
-        if (self.down_counter % 30) == 0:
-            logger.debug("Counting down to display off %d", self.down_counter)

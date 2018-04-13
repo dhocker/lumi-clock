@@ -23,7 +23,7 @@ import glob
 from functools import partial
 import os
 from lumiclock_app import LumiClockApplication
-from animated_gif_label import AnimatedGIFLabel
+from display_controller import DisplayController
 from configuration import QConfiguration
 from app_logger import AppLogger
 
@@ -34,11 +34,14 @@ logger = the_app_logger.getAppLogger()
 
 
 def main():
+    # Create state machine for display
+    display_controller = DisplayController(count_down_time=QConfiguration.timeout * 60)
+
     # Start the PIR sensor monitor
     threadinst = None
     if QConfiguration.pirsensor:
         from pir_sensor_thread import SensorThread
-        threadinst = SensorThread(count_down_time=QConfiguration.timeout * 60)
+        threadinst = SensorThread(notify=display_controller.set_display_state)
         threadinst.start()
 
     # Create main window and run the event loop
