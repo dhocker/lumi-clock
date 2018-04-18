@@ -130,6 +130,7 @@ class QConfiguration:
         conf["pirsensor"] = str(cls.pirsensor)
         conf["timeout"] = cls.timeout
         conf["debugdisplay"] = str(cls.debugdisplay)
+        conf["fontsize"] = cls.fontsize
 
         logger.debug("Saving configuration to %s", cls.full_file_path)
         cf = open(cls.full_file_path, "w")
