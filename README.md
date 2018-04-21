@@ -91,6 +91,37 @@ TBD - picture of finished project
 
 #### Setup
 
+##### Disable Display Sleep
+[Reference][Adjusting Display]
+
+By default, the desktop will put the display to sleep after a short
+time with no activity. For LumiClock to behave reasonably you can
+disable the sleep function. Unfortunately, this is not as simple as
+it should be.
+
+You need to edit the /etc/lightdm/lightdm.conf file
+```
+sudo nano /etc/lightdm/lightdm.conf
+```
+and add the following.
+
+```
+[SeatDefaults]
+xserver-command=X -s 0 dpms
+```
+
+##### Change Display Brightness
+[Reference][Adjusting Display]
+
+LumiClock can do with less than full backlight brightness. To change
+the brightness use this command.
+```
+sudo bash -c "echo n > /sys/class/backlight/rpi_backlight/brightness"
+```
+where 0 <= n <= 255.
+
+A value of 128 seems to work nicely.
+
 ## References
 * [Example](https://www.youtube.com/watch?v=hhVlHwHnsEg) - examples of
 Lumitime clocks.
@@ -104,3 +135,5 @@ that is easy to use.
 font.
 * [Chimply](http://www.chimply.com/Generator) - a good site for generating
 animated GIFs.
+* [Adjusting Display](https://raspberrypi.stackexchange.com/questions/46225/adjusting-the-brightness-of-the-official-touchscreen-display) -
+how to turn the display backlight on/off and adjust its brightness.
