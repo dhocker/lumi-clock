@@ -52,6 +52,8 @@ management. This is useful for determining if the PIR sensor is
 functioning as expected. Use a
 value of "True", "on" or 1 to enable. Use "False",
 "off" or 0 otherwise.
+* backlight: Sets the touchscreen display backlight brightness. A valid
+value is 0 <= backlight <= 255.
 
 ## Spinner
 The spinner is a 128x128 animated GIF. The project includes several

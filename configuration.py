@@ -38,6 +38,7 @@ class QConfiguration:
     spinner = "spiral_triangles.gif"
     color = "#EC3818"
     loglevel = "debug"
+    backlight = 128
     pirsensor = False
     timeout = 15
     debugdisplay = True
@@ -88,9 +89,17 @@ class QConfiguration:
                 try:
                     cls.timeout = int(cfj["timeout"])
                 except:
-                    logger.error("Invalid configuration value to timeout: %s", cfj["timeout"])
+                    logger.error("Invalid configuration value for timeout: %s", cfj["timeout"])
             if "debugdisplay" in cfj:
                 cls.debugdisplay = cfj["debugdisplay"].lower() in ["true", "on", "1"]
+            if "backlight" in cfj:
+                try:
+                    cls.backlight = int(cfj["backlight"])
+                    # Enforce 0 <= backlight <= 255
+                    cls.backlight = min(cls.backlight, 255)
+                    cls.backlight = max(cls.backlight, 0)
+                except:
+                    logger.error("Invalid configuration value for backlight: %s", cfj["backlight"])
             cf.close()
             cls.conf_exists = True
         except FileNotFoundError as ex:
@@ -131,6 +140,7 @@ class QConfiguration:
         conf["timeout"] = cls.timeout
         conf["debugdisplay"] = str(cls.debugdisplay)
         conf["fontsize"] = cls.fontsize
+        conf["backlight"] = cls.backlight
 
         logger.debug("Saving configuration to %s", cls.full_file_path)
         cf = open(cls.full_file_path, "w")

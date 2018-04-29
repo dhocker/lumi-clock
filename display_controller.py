@@ -21,6 +21,7 @@
 
 import threading
 import subprocess
+import platform
 from app_logger import AppLogger
 
 # Logger init
@@ -111,11 +112,20 @@ class DisplayController():
         Answers the question: Is the current display HDMI?
         Otherwise, it is assumed to be the RPi 7" touchscreen.
         """
-        res = subprocess.run(["tvservice", "-s"], stdout=subprocess.PIPE)
-        res = str(res.stdout, 'utf-8')
-        if res.find("HDMI") != -1:
-            return True
+        try:
+            res = subprocess.run(["tvservice", "-s"], stdout=subprocess.PIPE)
+            res = str(res.stdout, 'utf-8')
+            if res.find("HDMI") != -1:
+                return True
+            return False
+        except:
+            pass
         return False
+
+    @staticmethod
+    def is_raspberry_pi():
+        # A weak test for the RPi since it declares any ARM based system is an RPi.
+        return platform.machine().startswith("arm")
 
     """
     These methods can be overriden in a derived class
@@ -145,13 +155,16 @@ class DisplayController():
     @classmethod
     def turn_display_on(cls):
         cls._display_lock.acquire()
-        if DisplayController.is_hdmi_display():
-            subprocess.run(["vcgencmd", "display_power", "1"])
+        if DisplayController.is_raspberry_pi():
+            if DisplayController.is_hdmi_display():
+                subprocess.run(["vcgencmd", "display_power", "1"])
+            else:
+                # rpi 7" touchscreen
+                a = "echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
+                logger.debug(a)
+                subprocess.check_output(a, shell=True)
         else:
-            # rpi 7" touchscreen
-            a = "echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
-            logger.debug(a)
-            subprocess.check_output(a, shell=True)
+            pass
         cls._backlight_state = 1
         cls._display_lock.release()
         logger.debug("Display turned on")
@@ -159,13 +172,32 @@ class DisplayController():
     @classmethod
     def turn_display_off(cls):
         cls._display_lock.acquire()
-        if DisplayController.is_hdmi_display():
-            subprocess.run(["vcgencmd", "display_power", "0"])
+        if DisplayController.is_raspberry_pi():
+            if DisplayController.is_hdmi_display():
+                subprocess.run(["vcgencmd", "display_power", "0"])
+            elif DisplayController.is_raspberry_pi():
+                # rpi 7" touchscreen
+                a = "echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
+                logger.debug(a)
+                subprocess.check_output(a, shell=True)
         else:
-            # rpi 7" touchscreen
-            a = "echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
-            logger.debug(a)
-            subprocess.check_output(a, shell=True)
+            pass
         cls._backlight_state = 0
         cls._display_lock.release()
         logger.debug("Display turned off")
+
+    @classmethod
+    def set_display_backlight(cls, brightness):
+        cls._display_lock.acquire()
+        if DisplayController.is_raspberry_pi():
+            if DisplayController.is_hdmi_display():
+                pass
+            elif DisplayController.is_raspberry_pi():
+                # rpi 7" touchscreen
+                a = "echo %d | sudo tee /sys/class/backlight/rpi_backlight/brightness".format(brightness)
+                logger.debug(a)
+                subprocess.check_output(a, shell=True)
+        else:
+            pass
+        cls._display_lock.release()
+        logger.debug("Display backlight brightness set")

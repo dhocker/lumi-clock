@@ -22,6 +22,7 @@ import glob
 from functools import partial
 from animated_gif_label import AnimatedGIFLabel
 from configuration import QConfiguration
+from display_controller import DisplayController
 from app_logger import AppLogger
 
 
@@ -52,6 +53,9 @@ class LumiClockApplication(tk.Frame):
         logger.debug("Geometry: %s", geo)
         self.master.geometry(geo)
         self.master["bg"] = 'black'
+
+        # Set display brightness on RPi
+        DisplayController.set_display_backlight(QConfiguration.backlight)
 
         # Font size in pixels
         if QConfiguration.fontsize:
