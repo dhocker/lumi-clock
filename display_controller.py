@@ -194,7 +194,7 @@ class DisplayController():
                 pass
             elif DisplayController.is_raspberry_pi():
                 # rpi 7" touchscreen
-                a = "echo %d | sudo tee /sys/class/backlight/rpi_backlight/brightness".format(brightness)
+                a = "echo {0} | sudo tee /sys/class/backlight/rpi_backlight/brightness".format(brightness)
                 logger.debug(a)
                 subprocess.check_output(a, shell=True)
         else:
