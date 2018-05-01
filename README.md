@@ -125,17 +125,17 @@ where 0 <= n <= 255.
 A value of 128 seems to work nicely.
 
 ## References
-* [Example](https://www.youtube.com/watch?v=hhVlHwHnsEg) - examples of
+* [Example]: https://www.youtube.com/watch?v=hhVlHwHnsEg - examples of
 Lumitime clocks.
-* [History](http://www.objectplastic.com/2009/03/lumitime-clock-various-designers-tamura.html) -
+* [History]: http://www.objectplastic.com/2009/03/lumitime-clock-various-designers-tamura.html -
 some of the story behind the Lumitime clock.
-* [Display](https://www.adafruit.com/product/2718) - an 800x480 touchscreen
+* [Display]: https://www.adafruit.com/product/2718 - an 800x480 touchscreen
 that can be combined with a Raspberry Pi to build a clock.
-* [PIRSensor](https://adafruit.com/product/189) - an inexpensive module
+* [PIRSensor]: https://adafruit.com/product/189 - an inexpensive module
 that is easy to use.
 * [Digital Font](https://www.dafont.com/digital-7.font) - a nice digital (7 segment)
 font.
-* [Chimply](http://www.chimply.com/Generator) - a good site for generating
+* [Chimply]: http://www.chimply.com/Generator - a good site for generating
 animated GIFs.
-* [Adjusting Display](https://raspberrypi.stackexchange.com/questions/46225/adjusting-the-brightness-of-the-official-touchscreen-display) -
+* [Adjusting Display]: https://raspberrypi.stackexchange.com/questions/46225/adjusting-the-brightness-of-the-official-touchscreen-display -
 how to turn the display backlight on/off and adjust its brightness.
