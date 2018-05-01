@@ -117,21 +117,11 @@ class LumiClockApplication(tk.Frame):
         self.image_label.place(relx=1, x=-self.image_label.width, rely=0.5, anchor=tk.CENTER)
         self.image_label.bind("<Button-1>", self._show_context_menu)
 
-        if QConfiguration.debugdisplay and self._sensor:
-            self.debugfont = tkfont.Font(family='Helvetica', size=-20)
-
-            sensor_text = "PIR Sensor: {0}".format(self._sensor.sensor_value)
-            self.sensor_status = tk.Label(self, text=sensor_text, font=self.debugfont,
-                                          fg=QConfiguration.color, bg='black')
-            self.sensor_status.place(relx=0.5, x=-self.debugfont.measure("PIR Sensor: ???"), rely=1.0,
-                                     y=self.debugfont['size'], anchor=tk.CENTER)
-
-            count_down_text = "Count Down: {0}".format(self._display.down_counter)
-            self.count_down = tk.Label(self, text=count_down_text, font=self.debugfont,
-                                       fg=QConfiguration.color, bg='black')
-            self.count_down.place(relx=0.5, rely=1.0, y=self.debugfont['size'], anchor=tk.CENTER)
-        else:
-            logger.debug("Sensor debug display disabled")
+        # One line debug display at the bottom of the display
+        self.debugfont = tkfont.Font(family='Helvetica', size=-20)
+        self.debug_display = tk.Label(self, text="", font=self.debugfont,
+                                      fg=QConfiguration.color, bg='black')
+        self.debug_display.place(x=10, rely=1.0, y=self.debugfont['size']-10)
 
         # Start the clock
         self.run_clock = True
@@ -143,6 +133,7 @@ class LumiClockApplication(tk.Frame):
         :return:
         """
         if self.run_clock:
+            # Update the time display
             now = datetime.datetime.now()
             current = now.strftime("%I:%M")
             if now.hour >= 12:
@@ -160,11 +151,14 @@ class LumiClockApplication(tk.Frame):
                 self.textbox["text"] = current
                 self.last_time = current
 
-            if QConfiguration.debugdisplay and self._sensor:
-                sensor_text = "PIR Sensor: {0}".format(self._sensor.sensor_value)
-                self.sensor_status["text"] = sensor_text
-                count_down_text = "Count Down: {0}".format(self._display.down_counter)
-                self.count_down["text"] = count_down_text
+            # Update debug display
+            dd = ""
+            if QConfiguration.debugdisplay:
+                dd = "Time: {0} | ".format(now.strftime("%Y-%m-%d %H:%M:%S"))
+                if self._sensor:
+                    dd += "PIR Sensor: {0} | ".format(self._sensor.sensor_value)
+            dd += "Count Down: {0}".format(self._display.down_counter)
+            self.debug_display["text"] = dd
 
             self.after(1000, self._update_clock)
 
@@ -293,6 +287,8 @@ class ContextMenu(tk.Menu):
         self.add_separator()
         self.add_command(label="Toggle fullscreen", command=self._toggle_fullscreen, font=menu_font)
         self.add_separator()
+        self.add_command(label="Toggle Debug display", command=self._toggle_debug_display, font=menu_font)
+        self.add_separator()
         self.add_command(label="Save configuration", command=self._save_configuration, font=menu_font)
         self.add_separator()
         self.add_command(label="Quit", command=self._quit, font=menu_font)
@@ -326,6 +322,9 @@ class ContextMenu(tk.Menu):
     def _save_configuration(self):
         QConfiguration.save()
         messagebox.showinfo("Save Configuration", "The current configuration has been saved")
+
+    def _toggle_debug_display(self):
+        QConfiguration.debugdisplay = not QConfiguration.debugdisplay
 
     def _quit(self):
         """
