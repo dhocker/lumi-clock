@@ -153,6 +153,7 @@ class QConfiguration:
         conf["debugdisplay"] = str(cls.debugdisplay)
         conf["fontsize"] = cls.fontsize
         conf["backlight"] = cls.backlight
+        conf["pirpin"] = cls.pirpin
 
         logger.debug("Saving configuration to %s", cls.full_file_path)
         cf = open(cls.full_file_path, "w")
