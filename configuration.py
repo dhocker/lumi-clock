@@ -132,6 +132,9 @@ class QConfiguration:
         # This sets the log level to whatever default was set above.
         the_app_logger.set_log_level(cls.loglevel)
 
+        # Dump the config for debugging purposes
+        QConfiguration.log_dump()
+
     @classmethod
     def save(cls):
         """
@@ -143,6 +146,28 @@ class QConfiguration:
         if not os.path.exists(cls.file_path):
             os.makedirs(cls.file_path)
 
+        conf = QConfiguration.to_dict()
+
+        logger.debug("Saving configuration to %s", cls.full_file_path)
+        cf = open(cls.full_file_path, "w")
+        json.dump(conf, cf, indent=4)
+        cf.close()
+
+        cls.conf_exists = True
+
+    @classmethod
+    def log_dump(cls):
+        conf = QConfiguration.to_dict()
+
+        logger.debug("Dumping configuration file %s", cls.full_file_path)
+        logger.debug(json.dumps(conf, indent=4))
+
+    @classmethod
+    def to_dict(cls):
+        """
+        Make a dict from the configuration properties
+        :return:
+        """
         conf = {}
         conf["loglevel"] = cls.loglevel
         conf["font"] = cls.font
@@ -154,13 +179,7 @@ class QConfiguration:
         conf["fontsize"] = cls.fontsize
         conf["backlight"] = cls.backlight
         conf["pirpin"] = cls.pirpin
-
-        logger.debug("Saving configuration to %s", cls.full_file_path)
-        cf = open(cls.full_file_path, "w")
-        json.dump(conf, cf, indent=4)
-        cf.close()
-
-        cls.conf_exists = True
+        return conf
 
     @classmethod
     def is_configured(cls):
