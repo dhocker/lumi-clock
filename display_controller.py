@@ -35,6 +35,7 @@ class DisplayController():
     Display off
     Display on
     Count down to display off
+    Count down to display on
     Unknown
 
     """
@@ -42,24 +43,27 @@ class DisplayController():
     # states
     _state_display_off = 0
     _state_display_on = 1
-    _state_display_count_down = 2
+    _state_display_off_count_down = 2
+    _state_display_on_count_down = 3
     _state_unknown = -1
 
     # Serializes access to the display
     _display_lock = threading.Lock()
     _backlight_state = 0
 
-    def __init__(self, count_down_time=60*1):
+    def __init__(self, off_count_down_time=60 * 1, on_count_down_time=3):
         """
         Class constructor.
         count_down_time: in seconds, how long to wait before entering the
             display off state.
         """
         self._display_state = self._state_unknown
-        self._count_down_time = count_down_time
+        self._off_count_down_time = off_count_down_time
+        self._on_count_down_time = on_count_down_time
 
         # Public properties
-        self.down_counter = 0
+        self.off_counter = 0
+        self.on_counter = 0
         self.sensor_value = 0
 
     """
@@ -68,22 +72,28 @@ class DisplayController():
     """
     
     def set_display_state(self, sensor_value):
+        """
+        Display management state machine
+        :param sensor_value:
+        :return:
+        """
         self.sensor_value = sensor_value
         if self._display_state == self._state_display_off:
             if self.sensor_value:
-                # new state is on
-                self._display_state = self._state_display_on
-                self.display_on()
+                # new state is on count down
+                self._display_state = self._state_display_on_count_down
+                self.on_counter = self._on_count_down_time
+                self.display_on_count_down()
         elif self._display_state == self._state_display_on:
             if not self.sensor_value:
-                # New state is counting down
-                self.down_counter = self._count_down_time
-                self._display_state = self._state_display_count_down
-                self.display_count_down()
-        elif self._display_state == self._state_display_count_down:
+                # New state is counting down to display off
+                self.off_counter = self._off_count_down_time
+                self._display_state = self._state_display_off_count_down
+                self.display_off_count_down()
+        elif self._display_state == self._state_display_off_count_down:
             # Counting down to display off
-            self.down_counter -= 1
-            if self.down_counter <= 0:
+            self.off_counter -= 1
+            if self.off_counter <= 0:
                 # New state is display off
                 self._display_state = self._state_display_off
                 self.display_off()
@@ -93,15 +103,29 @@ class DisplayController():
                 self.display_on()
             else:
                 # Maintain same state
-                self.display_counting_down()
+                self.display_off_counting_down()
+        elif self._display_state == self._state_display_on_count_down:
+            # Counting down to display on
+            self.on_counter -= 1
+            if self.on_counter <= 0:
+                # New state is display on
+                self._display_state = self._state_display_on
+                self.display_on()
+            elif not self.sensor_value:
+                # New state is display off because the display is off
+                self._display_state = self._state_display_off
+                self.display_off()
+            else:
+                # Counting down to display on continues
+                self.display_on_counting_down()
         elif self._display_state == self._state_unknown:
             if self.sensor_value:
                 self._display_state = self._state_display_on
                 self.display_on()
             else:
-                self.down_counter = self._count_down_time
-                self._display_state = self._state_display_count_down
-                self.display_count_down()
+                self.off_counter = self._off_count_down_time
+                self._display_state = self._state_display_off_count_down
+                self.display_off_count_down()
         else:
             # Unknown state
             logger.debug("Undefined state", self._display_state)
@@ -139,12 +163,19 @@ class DisplayController():
     def display_off(self):
         self.turn_display_off()
 
-    def display_count_down(self):
-        logger.debug("Starting count down to display off from %d", self.down_counter)
+    def display_off_count_down(self):
+        logger.debug("Starting count down to display off from %d", self.off_counter)
 
-    def display_counting_down(self):
-        if (self.down_counter % 30) == 0:
-            logger.debug("Counting down to display off %d", self.down_counter)
+    def display_off_counting_down(self):
+        if (self.off_counter % 30) == 0:
+            logger.debug("Counting down to display off %d", self.off_counter)
+
+    def display_on_count_down(self):
+        logger.debug("Starting count down to display on from %d", self.on_counter)
+
+    def display_on_counting_down(self):
+        if (self.on_counter % 30) == 0:
+            logger.debug("Counting down to display on %d", self.on_counter)
 
     """
     The techniques used to manage diffrent displays was

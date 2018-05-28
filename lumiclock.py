@@ -35,7 +35,7 @@ logger = the_app_logger.getAppLogger()
 
 def main():
     # Create state machine for display
-    display_controller = DisplayController(count_down_time=QConfiguration.timeout * 60)
+    display_controller = DisplayController(off_count_down_time=QConfiguration.timeout * 60)
 
     # Start the PIR sensor monitor
     threadinst = None
