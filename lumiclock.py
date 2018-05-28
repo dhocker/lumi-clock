@@ -41,7 +41,7 @@ def main():
     threadinst = None
     if QConfiguration.pirsensor:
         from pir_sensor_thread import SensorThread
-        threadinst = SensorThread(notify=display_controller.set_display_state)
+        threadinst = SensorThread(notify=display_controller.set_display_state, pir_pin=QConfiguration.pirpin)
         threadinst.start()
 
     # Create main window and run the event loop

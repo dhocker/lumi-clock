@@ -42,15 +42,16 @@ class QConfiguration:
     pirsensor = False
     timeout = 15
     debugdisplay = True
+    # GPIO 18 or BCM pin 12
+    pirpin = 12
     cwd = ""
     conf_exists = False
 
     @classmethod
     def load(cls):
         """
-        Load credentials from configuration file. The location of the iex.conf
-        file is OS dependent. The permissions of the iex.conf file should allow
-        access ONLY by the user.
+        Load application settings from configuration file. The location of the lumiclock.conf
+        file is OS dependent.
         :return: None
         """
         file_name = "lumiclock.conf"
@@ -98,6 +99,17 @@ class QConfiguration:
                     # Enforce 0 <= backlight <= 255
                     cls.backlight = min(cls.backlight, 255)
                     cls.backlight = max(cls.backlight, 0)
+                except:
+                    logger.error("Invalid configuration value for backlight: %s", cfj["backlight"])
+            if "pirpin" in cfj:
+                try:
+                    pin = int(cfj["pirpin"])
+                    # Enforce 3 <= pirpin <= 40
+                    if pin < 3 or pin > 40:
+                        raise ValueError("Invalid configuration value for pirpin: %s", str(cfj["pirpin"]))
+                    cls.pirpin = pin
+                except ValueError as ex:
+                    logger.error(ex)
                 except:
                     logger.error("Invalid configuration value for backlight: %s", cfj["backlight"])
             cf.close()
