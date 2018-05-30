@@ -99,9 +99,10 @@ class DisplayController():
                 self._display_state = self._state_display_off
                 self.display_off()
             elif self.sensor_value:
-                # New state is display on
-                self._display_state = self._state_display_on
-                self.display_on()
+                # New state is counting down to display on
+                self._display_state = self._state_display_on_count_down
+                self.on_counter = self._on_count_down_time
+                self.display_on_count_down()
             else:
                 # Maintain same state
                 self.display_off_counting_down()
