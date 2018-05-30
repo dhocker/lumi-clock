@@ -155,6 +155,7 @@ class LumiClockApplication(tk.Frame):
             dd = ""
             if QConfiguration.debugdisplay:
                 dd = "Time: {0}".format(now.strftime("%Y-%m-%d %H:%M:%S"))
+                dd += " | Display: {0}".format(self._display.get_display_state())
                 if self._sensor:
                     dd += " | PIR Sensor: {0}".format(self._sensor.sensor_value)
                     dd += " | Off Counter: {0}".format(self._display.off_counter)

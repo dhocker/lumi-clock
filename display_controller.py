@@ -41,11 +41,12 @@ class DisplayController():
     """
 
     # states
-    _state_display_off = 0
-    _state_display_on = 1
-    _state_display_off_count_down = 2
-    _state_display_on_count_down = 3
-    _state_unknown = -1
+    _state_unknown = 0
+    _state_display_off = 1
+    _state_display_on = 2
+    _state_display_off_count_down = 3
+    _state_display_on_count_down = 4
+    _display_states = ["unknown", "off", "on", "off-count", "on-count"]
 
     # Serializes access to the display
     _display_lock = threading.Lock()
@@ -129,6 +130,9 @@ class DisplayController():
         else:
             # Unknown state
             logger.debug("Undefined state", self._display_state)
+
+    def get_display_state(self):
+        return self._display_states[self._display_state]
 
     @staticmethod
     def is_hdmi_display():
