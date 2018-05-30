@@ -120,8 +120,8 @@ class LumiClockApplication(tk.Frame):
         # One line debug display at the bottom of the display
         self.debugfont = tkfont.Font(family='Helvetica', size=-20)
         self.debug_display = tk.Label(self, text="", font=self.debugfont,
-                                      fg=QConfiguration.color, bg='black')
-        self.debug_display.place(x=10, rely=1.0, y=(self.debugfont['size']*2)-10)
+                                      fg=QConfiguration.color, bg='black', anchor=tk.W)
+        self.debug_display.place(x=10, rely=1.0, y=(self.debugfont['size']*2)-20)
 
         # Start the clock
         self.run_clock = True
