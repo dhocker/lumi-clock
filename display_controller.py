@@ -102,6 +102,7 @@ class DisplayController():
                 # New state is counting down to display on
                 self._display_state = self._state_display_on_count_down
                 self.on_counter = self._on_count_down_time
+                logger.debug("Display off count down terminated by PIR sensor trigger on")
                 self.display_on_count_down()
             else:
                 # Maintain same state
@@ -116,6 +117,7 @@ class DisplayController():
             elif not self.sensor_value:
                 # New state is display off because the display is off
                 self._display_state = self._state_display_off
+                logger.debug("Display on count down terminated by PIR sensor trigger off")
                 self.display_off()
             else:
                 # Counting down to display on continues

@@ -89,15 +89,20 @@ class SensorThread(threading.Thread):
         its own thread.
         """
 
-        while not self._terminate_thread:
-            # Read the current state of the PIR sensor.
-            # 0 = no movement detected
-            # 1 = movement detected
-            self.sensor_value = GPIO.input(self.pir_pin)
+        try:
+            while not self._terminate_thread:
+                # Read the current state of the PIR sensor.
+                # 0 = no movement detected
+                # 1 = movement detected
+                self.sensor_value = GPIO.input(self.pir_pin)
 
-            if self._notify_proc:
-                self._notify_proc(self.sensor_value)
+                if self._notify_proc:
+                    self._notify_proc(self.sensor_value)
 
-            # This is why the sensor monitor runs on its own thread.
-            time.sleep(1.0)
-        logger.debug("Sensor thread terminated")
+                # This is why the sensor monitor runs on its own thread.
+                time.sleep(1.0)
+            logger.debug("Sensor thread terminated")
+        except Exception as ex:
+            logger.error("PIR Sensor thread terminated by unhandled exception")
+            logger.error(ex)
+        
