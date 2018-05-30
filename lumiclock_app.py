@@ -121,7 +121,7 @@ class LumiClockApplication(tk.Frame):
         self.debugfont = tkfont.Font(family='Helvetica', size=-20)
         self.debug_display = tk.Label(self, text="", font=self.debugfont,
                                       fg=QConfiguration.color, bg='black')
-        self.debug_display.place(x=10, rely=1.0, y=self.debugfont['size']-10)
+        self.debug_display.place(x=10, rely=1.0, y=(self.debugfont['size']*2)-10)
 
         # Start the clock
         self.run_clock = True
@@ -155,7 +155,7 @@ class LumiClockApplication(tk.Frame):
             dd = ""
             if QConfiguration.debugdisplay:
                 dd = "Time: {0}".format(now.strftime("%Y-%m-%d %H:%M:%S"))
-                dd += " | Display: {0}".format(self._display.get_display_state())
+                dd += "\nDisplay: {0}".format(self._display.get_display_state())
                 if self._sensor:
                     dd += " | PIR Sensor: {0}".format(self._sensor.sensor_value)
                     dd += " | Off Counter: {0}".format(self._display.off_counter)
