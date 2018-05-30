@@ -40,7 +40,8 @@ class QConfiguration:
     loglevel = "debug"
     backlight = 128
     pirsensor = False
-    timeout = 15
+    timeout = 10 * 60
+    timein = 10
     debugdisplay = True
     # GPIO 18 or BCM pin 12
     pirpin = 12
@@ -91,6 +92,11 @@ class QConfiguration:
                     cls.timeout = int(cfj["timeout"])
                 except:
                     logger.error("Invalid configuration value for timeout: %s", cfj["timeout"])
+            if "timein" in cfj:
+                try:
+                    cls.timein = int(cfj["timein"])
+                except:
+                    logger.error("Invalid configuration value for timein: %s", cfj["timein"])
             if "debugdisplay" in cfj:
                 cls.debugdisplay = cfj["debugdisplay"].lower() in ["true", "on", "1"]
             if "backlight" in cfj:

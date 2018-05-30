@@ -44,9 +44,14 @@ The default is "debug".
 value of "True", "on" or 1 to indicate one is present. Use "False",
 "off" or 0 otherwise. This setting allows you to run LumiClock on
 a Raspberry Pi without a PIR sensor.
-* timeout: Sets the display timeout value in minutes. This is only
+* timeout: Sets the display timeout value in seconds. This is only
 meaningful if you have a PIR motion sensor. This is how long the
 display will stay on once the PIR sensor indicates no motion.
+* timein: Sets the display timein value in seconds.  This is only
+meaningful if you have a PIR motion sensor. The timein is how long
+the PIR sensor must indicate motion before the display is turned on.
+In effect, this is how the PIR sensor signal is debounced to avoid
+false trigger signals.
 * debugdisplay: Logs detailed information about display
 management. This is useful for determining if the PIR sensor is
 functioning as expected. Use a

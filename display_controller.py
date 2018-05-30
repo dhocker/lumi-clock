@@ -52,7 +52,7 @@ class DisplayController():
     _display_lock = threading.Lock()
     _backlight_state = 0
 
-    def __init__(self, off_count_down_time=60 * 1, on_count_down_time=3):
+    def __init__(self, off_count_down_time=60 * 1, on_count_down_time=10):
         """
         Class constructor.
         count_down_time: in seconds, how long to wait before entering the
