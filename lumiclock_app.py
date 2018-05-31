@@ -44,6 +44,7 @@ class LumiClockApplication(tk.Frame):
         self.toggle_ampm = True
         self.fullscreen = False
         self.run_clock = False
+        self._debug_lines = 2
 
         # Screen dimensions
         self.screen_width = self.master.winfo_screenwidth()
@@ -117,11 +118,17 @@ class LumiClockApplication(tk.Frame):
         self.image_label.place(relx=1, x=-self.image_label.width, rely=0.5, anchor=tk.CENTER)
         self.image_label.bind("<Button-1>", self._show_context_menu)
 
-        # One line debug display at the bottom of the display
+        # Multi-line debug display at the bottom of the display
         self.debugfont = tkfont.Font(family='Helvetica', size=-20)
         self.debug_display = tk.Label(self, text="", font=self.debugfont,
-                                      fg=QConfiguration.color, bg='black', anchor=tk.W)
-        self.debug_display.place(x=10, rely=1.0, y=(self.debugfont['size']*2)-20)
+                                      fg=QConfiguration.color, bg='black',
+                                      anchor=tk.W, justify=tk.LEFT)
+        # Note that the font size is a negative number (of pixels).
+        # The 1.5 multiplier provides for a line spacing half the size of the font.
+        font_size = self.debugfont['size']
+        self.debug_display.place(x=10,
+                                 rely=1.0,
+                                 y=int(font_size * 1.5 * self._debug_lines))
 
         # Start the clock
         self.run_clock = True

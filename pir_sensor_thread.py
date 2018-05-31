@@ -105,4 +105,3 @@ class SensorThread(threading.Thread):
         except Exception as ex:
             logger.error("PIR Sensor thread terminated by unhandled exception")
             logger.error(ex)
-        
