@@ -1,30 +1,26 @@
+# -*- coding: UTF-8 -*-
 #
-# Adafruit PIR sensor state machine on a thread
-# http://adafruit/189
+# Copyright © 2018, 2019  Dave Hocker (email: athomex10@gmail.com)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the LICENSE.md file for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program (the LICENSE.md file).  If not, see <http://www.gnu.org/licenses/>.
 #
 # The sensor monitor needs to run on its own thread so that
 # it is not subject the behaviour of anything else like tkinter.
 #
-# How to turn official 7" touchscreen display on and off
-# https://scribles.net/controlling-display-backlight-on-raspberry-pi/
-#
-# OFF
-# echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power
-# ON
-# echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power
-#
-# And, how to do it for an HDMI attached display.
-#
-# OFF
-# vcgencmd display_power 0
-# ON
-# vcgencmd display_power 1
 
 import RPi.GPIO as GPIO
 import time
 import threading
-import subprocess
-from display_controller import DisplayController
 from app_logger import AppLogger
 
 
@@ -35,7 +31,7 @@ logger = the_app_logger.getAppLogger()
 
 class SensorThread(threading.Thread):
     """
-    Thread based class for working with the Adafruit PIR sensor.
+    Thread based class for working with a 3 pin PIR sensor.
     This class can be used as-is or it can be used as the base
     class for a more customized implementation.
     Reference: http://adafruit/189
@@ -45,10 +41,10 @@ class SensorThread(threading.Thread):
     def __init__(self, pir_pin=12, name="PIRSensorThread", notify=None):
         """
         Class constructor.
-        pir_pin: board pin number where PIR data line is connected.
-        count_down_time: in seconds, how long to wait before entering the
-            display off state.
-        name: A human readable name for the thread.
+        :param pir_pin: board pin number where PIR sensor data line is connected.
+        :param name: A human readable name for the thread.
+        :param notify: Callback for handling sensor state. This method will
+        be called on the sensor thread, NOT the current thread.
         """
         threading.Thread.__init__(self, name=name)
         # Using pin 12 (GPIO 18) for PIR sensor signal

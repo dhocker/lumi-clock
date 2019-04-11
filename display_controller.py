@@ -1,8 +1,19 @@
+# -*- coding: UTF-8 -*-
 #
 # Raspberry Pi display controller
+# Copyright © 2018, 2019  Dave Hocker (email: athomex10@gmail.com)
 #
-# The sensor monitor needs to run on its own thread so that
-# it is not subject the behaviour of anything else like tkinter.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the LICENSE.md file for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program (the LICENSE.md file).  If not, see <http://www.gnu.org/licenses/>.
 #
 # How to turn official 7" touchscreen display on and off
 # https://scribles.net/controlling-display-backlight-on-raspberry-pi/
@@ -18,6 +29,7 @@
 # vcgencmd display_power 0
 # ON
 # vcgencmd display_power 1
+#
 
 import threading
 import subprocess

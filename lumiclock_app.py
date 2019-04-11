@@ -1,6 +1,7 @@
+# -*- coding: UTF-8 -*-
 #
 # Digital clock inspired by the LumiTime clock series
-# Copyright (C) 2018  Dave Hocker (email: athomex10@gmail.com)
+# Copyright © 2018, 2019  Dave Hocker (email: athomex10@gmail.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
