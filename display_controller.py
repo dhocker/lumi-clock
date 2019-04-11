@@ -22,6 +22,7 @@
 import threading
 import subprocess
 import platform
+import rpi_backlight as backlight
 from app_logger import AppLogger
 
 # Logger init
@@ -58,7 +59,7 @@ class DisplayController():
         count_down_time: in seconds, how long to wait before entering the
             display off state.
         """
-        self._display_state = self._state_unknown
+        self._display_state = DisplayController.query_display_state()
         self._off_count_down_time = off_count_down_time
         self._on_count_down_time = on_count_down_time
 
@@ -99,11 +100,15 @@ class DisplayController():
                 self._display_state = self._state_display_off
                 self.display_off()
             elif self.sensor_value:
-                # New state is counting down to display on
-                self._display_state = self._state_display_on_count_down
-                self.on_counter = self._on_count_down_time
-                logger.debug("Display off count down terminated by PIR sensor trigger on")
-                self.display_on_count_down()
+                if not self.query_display_state():
+                    # New state is counting down to display on
+                    self._display_state = self._state_display_on_count_down
+                    self.on_counter = self._on_count_down_time
+                    logger.debug("Display off count down terminated by PIR sensor trigger on")
+                    self.display_on_count_down()
+                else:
+                    # Sensor on and display on, state is display on
+                    self._display_state = self._state_display_on
             else:
                 # Maintain same state
                 self.display_off_counting_down()
@@ -115,21 +120,24 @@ class DisplayController():
                 self._display_state = self._state_display_on
                 self.display_on()
             elif not self.sensor_value:
-                # New state is display off because the display is off
-                self._display_state = self._state_display_off
-                logger.debug("Display on count down terminated by PIR sensor trigger off")
-                self.display_off()
+                if self.query_display_state():
+                    # New state is count down to display off because the display is on
+                    self._display_state = self._state_display_off_count_down
+                    logger.debug("Display on count down terminated by PIR sensor trigger off")
+                    self.display_off_counting_down()
+                else:
+                    # Sensor off and display off, state is display off
+                    self._display_state = self._state_display_off
             else:
                 # Counting down to display on continues
                 self.display_on_counting_down()
         elif self._display_state == self._state_unknown:
-            if self.sensor_value:
+            if self.query_display_state():
                 self._display_state = self._state_display_on
                 self.display_on()
             else:
-                self.off_counter = self._off_count_down_time
-                self._display_state = self._state_display_off_count_down
-                self.display_off_count_down()
+                self._display_state = self._state_display_off
+                self.display_off()
         else:
             # Unknown state
             logger.debug("Undefined state", self._display_state)
@@ -189,6 +197,26 @@ class DisplayController():
     found at: https://scribles.net/controlling-display-backlight-on-raspberry-pi/
     Note that these are class methods because there is only one physical display.
     """
+
+    @classmethod
+    def query_display_state(cls):
+        cls._display_lock.acquire()
+        state = cls._state_unknown
+        if DisplayController.is_raspberry_pi():
+            if DisplayController.is_hdmi_display():
+                # subprocess.run(["vcgencmd", "display_power", "1"])
+                state = cls._state_unknown
+            else:
+                # rpi 7" touchscreen
+                if backlight.get_power():
+                    state = cls._state_display_on
+                else:
+                    state = cls._state_display_off
+        else:
+            pass
+        cls._display_lock.release()
+        logger.debug("Current display state %s", cls._display_states[state])
+        return state
 
     @classmethod
     def turn_display_on(cls):
