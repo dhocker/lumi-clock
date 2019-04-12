@@ -57,28 +57,19 @@ class DisplayController():
     _state_unknown = 0
     _state_display_off = 1
     _state_display_on = 2
-    _state_display_off_count_down = 3
-    _state_display_on_count_down = 4
-    _display_states = ["unknown", "off", "on", "off-count", "on-count"]
+    _display_states = ["unknown", "off", "on"]
 
     # Serializes access to the display
     _display_lock = threading.Lock()
     _backlight_state = 0
 
-    def __init__(self, off_count_down_time=60 * 1, on_count_down_time=10):
+    def __init__(self):
         """
         Class constructor.
         count_down_time: in seconds, how long to wait before entering the
             display off state.
         """
         self._display_state = DisplayController.query_display_state()
-        self._off_count_down_time = off_count_down_time
-        self._on_count_down_time = on_count_down_time
-
-        # Public properties
-        self.off_counter = 0
-        self.on_counter = 0
-        self.sensor_value = 0
 
     """
     The techniques used to manage diffrent displays was
@@ -88,68 +79,25 @@ class DisplayController():
     def set_display_state(self, sensor_value):
         """
         Display management state machine
-        :param sensor_value:
-        :return:
+        :param sensor_value: The current debounced value of the PIR sensor
+        :return: None
         """
-        self.sensor_value = sensor_value
         if self._display_state == self._state_display_off:
-            if self.sensor_value:
-                # new state is on count down
-                self._display_state = self._state_display_on_count_down
-                self.on_counter = self._on_count_down_time
-                self.display_on_count_down()
+            # Current state is display off
+            if sensor_value:
+                # New state is on
+                self._display_state = self._state_display_on
+                self.display_on()
+            else:
+                pass
         elif self._display_state == self._state_display_on:
-            if not self.sensor_value:
-                # New state is counting down to display off
-                self.off_counter = self._off_count_down_time
-                self._display_state = self._state_display_off_count_down
-                self.display_off_count_down()
-        elif self._display_state == self._state_display_off_count_down:
-            # Counting down to display off
-            self.off_counter -= 1
-            if self.off_counter <= 0:
-                # New state is display off
+            # Current state is display on
+            if not sensor_value:
+                # New state is off
                 self._display_state = self._state_display_off
                 self.display_off()
-            elif self.sensor_value:
-                if not self.query_display_state():
-                    # New state is counting down to display on
-                    self._display_state = self._state_display_on_count_down
-                    self.on_counter = self._on_count_down_time
-                    logger.debug("Display off count down terminated by PIR sensor trigger on")
-                    self.display_on_count_down()
-                else:
-                    # Sensor on and display on, state is display on
-                    self._display_state = self._state_display_on
             else:
-                # Maintain same state
-                self.display_off_counting_down()
-        elif self._display_state == self._state_display_on_count_down:
-            # Counting down to display on
-            self.on_counter -= 1
-            if self.on_counter <= 0:
-                # New state is display on
-                self._display_state = self._state_display_on
-                self.display_on()
-            elif not self.sensor_value:
-                if self.query_display_state():
-                    # New state is count down to display off because the display is on
-                    self._display_state = self._state_display_off_count_down
-                    logger.debug("Display on count down terminated by PIR sensor trigger off")
-                    self.display_off_counting_down()
-                else:
-                    # Sensor off and display off, state is display off
-                    self._display_state = self._state_display_off
-            else:
-                # Counting down to display on continues
-                self.display_on_counting_down()
-        elif self._display_state == self._state_unknown:
-            if self.query_display_state():
-                self._display_state = self._state_display_on
-                self.display_on()
-            else:
-                self._display_state = self._state_display_off
-                self.display_off()
+                pass
         else:
             # Unknown state
             logger.debug("Undefined state", self._display_state)

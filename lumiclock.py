@@ -32,14 +32,16 @@ logger = the_app_logger.getAppLogger()
 
 def main():
     # Create state machine for display
-    display_controller = DisplayController(off_count_down_time=QConfiguration.timeout,
-                                           on_count_down_time=QConfiguration.timein)
+    display_controller = DisplayController()
 
     # Start the PIR sensor monitor
     threadinst = None
     if QConfiguration.pirsensor:
         from pir_sensor_thread import SensorThread
-        threadinst = SensorThread(notify=display_controller.set_display_state, pir_pin=QConfiguration.pirpin)
+        threadinst = SensorThread(notify=display_controller.set_display_state,
+                                  pir_pin=QConfiguration.pirpin,
+                                  time_off=QConfiguration.timeout,
+                                  time_on=QConfiguration.timein)
         threadinst.start()
 
     # Create main window and run the event loop
