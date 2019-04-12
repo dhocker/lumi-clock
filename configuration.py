@@ -182,6 +182,7 @@ class QConfiguration:
         conf["spinner"] = cls.spinner
         conf["pirsensor"] = str(cls.pirsensor)
         conf["timeout"] = cls.timeout
+        conf["timein"] = cls.timein
         conf["debugdisplay"] = str(cls.debugdisplay)
         conf["fontsize"] = cls.fontsize
         conf["backlight"] = cls.backlight
