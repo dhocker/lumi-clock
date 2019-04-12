@@ -129,6 +129,7 @@ class SensorThread(threading.Thread):
         # 0 = no movement detected
         # 1 = movement detected
         actual_sensor_value = GPIO.input(self.pir_pin)
+        logger.debug("Actual sensor: %d", actual_sensor_value)
 
         # This is the state machine
         if self._sensor_state == self._state_init:

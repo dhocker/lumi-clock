@@ -65,6 +65,11 @@ class AppLogger:
             self.logger.debug("New logger %s created: %s", logname, str(self.logger))
             self.logger.debug("%s logging to file: %s", logname, logfile)
 
+            # create console handler
+            ch = logging.StreamHandler()
+            ch.setFormatter(formatter)
+            self.logger.addHandler(ch)
+
             # Note that this logname has been defined
             AppLogger.logger_list.append(logname)
         else:

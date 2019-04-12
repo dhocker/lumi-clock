@@ -84,16 +84,18 @@ def pir_update_handler(sensor_value):
 def main():
     pir = 12
     from pir_sensor_thread import SensorThread
-    threadinst = SensorThread(notify=pir_update_handler, pir_pin=12, time_off=300, time_on=10)
+    threadinst = SensorThread(notify=pir_update_handler, pir_pin=12, time_off=10, time_on=10)
     threadinst.start()
 
     try:
-        time.sleep(1.0)
+        while True:
+            time.sleep(1.0)
     except:
         print()
         print("Keyboard interrupt")
 
     threadinst.terminate()
+    the_app_logger.Shutdown()
 
     print("End")
 
