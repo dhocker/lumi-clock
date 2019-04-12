@@ -166,8 +166,8 @@ class LumiClockApplication(tk.Frame):
                 dd += "\nDisplay: {0}".format(self._display.get_display_state())
                 if self._sensor:
                     dd += " | PIR Sensor: {0}".format(self._sensor.sensor_value)
-                    dd += " | Off Counter: {0}".format(self._display.off_counter)
-                    dd += " | On Counter: {0}".format(self._display.on_counter)
+                    dd += " | Off Counter: {0}".format(self._sensor.off_counter)
+                    dd += " | On Counter: {0}".format(self._sensor.on_counter)
             self.debug_display["text"] = dd
 
             self.after(1000, self._update_clock)

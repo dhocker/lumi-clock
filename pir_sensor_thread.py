@@ -118,6 +118,14 @@ class SensorThread(threading.Thread):
             logger.error("PIR Sensor thread terminated by unhandled exception")
             logger.error(ex)
 
+    @property
+    def off_counter(self):
+        return self._count_down_off
+
+    @property
+    def on_counter(self):
+        return self._count_down_on
+
     def _update_sensor(self):
         """
         Update the sensor state machine based on the current value of the sensor.
