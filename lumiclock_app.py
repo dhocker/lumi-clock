@@ -46,6 +46,7 @@ class LumiClockApplication(tk.Frame):
         self.fullscreen = False
         self.run_clock = False
         self._debug_lines = 2
+        self._menu_showing = False
 
         # Screen dimensions
         self.screen_width = self.master.winfo_screenwidth()
@@ -86,9 +87,13 @@ class LumiClockApplication(tk.Frame):
         self.bind("<Button-1>", self._show_context_menu)
 
     def _show_context_menu(self, event):
-        # Always position context menu at the top so there is maximum
-        # amount of screen for submenus.
-        self.context_menu.post(event.x_root, 0)
+        if self._menu_showing:
+            self.context_menu.unpost()
+        else:
+            # Always position context menu at the top so there is maximum
+            # amount of screen for submenus.
+            self.context_menu.post(event.x_root, 0)
+        self._menu_showing = not self._menu_showing
         return "break"
 
     def toggle_fullscreen(self, event=None):
