@@ -100,7 +100,7 @@ class DisplayController():
                 pass
         else:
             # Unknown state
-            logger.debug("Undefined state", self._display_state)
+            logger.debug("Undefined state %s", self._display_state)
 
     def get_display_state(self):
         return self._display_states[self._display_state]
