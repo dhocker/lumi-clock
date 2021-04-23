@@ -123,8 +123,8 @@ class DisplayController():
 
     @staticmethod
     def is_raspberry_pi():
-        # A weak test for the RPi since it declares any ARM based system is an RPi.
-        return platform.machine().startswith("arm")
+        # A weak test for the RPi
+        return platform.machine() in ["armv7l", "armv8l"]
 
     """
     These methods can be overriden in a derived class
