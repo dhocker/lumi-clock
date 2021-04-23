@@ -1,4 +1,3 @@
-Pillow==6.2.0
-RPi.GPIO==0.7.0
-rpi-backlight ; platform_machine == "armv7l"
-rpi-backlight ; platform_machine == "armv8l"
+Pillow
+RPi.GPIO
+rpi-backlight
