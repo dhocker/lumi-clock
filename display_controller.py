@@ -42,7 +42,7 @@ the_app_logger = AppLogger("lumiclock")
 logger = the_app_logger.getAppLogger()
 
 
-class DisplayController():
+class DisplayController:
     """
     The display is controlled by a state machine.
     Display off
@@ -63,10 +63,8 @@ class DisplayController():
     _display_lock = threading.Lock()
     _backlight_state = 0
 
-    # This path needs to be determined based on machine/OS version
-    # This value works for RPi OS Desktop 64-bit aarch64.
-    # It will not work for 32-bit OSes.
-    _backlight = rpi_backlight.Backlight("/sys/class/backlight/10-0045")
+    # A singleton instance of the backlight class
+    _backlight = None
 
     def __init__(self):
         """
@@ -75,6 +73,20 @@ class DisplayController():
             display off state.
         """
         self._display_state = DisplayController.query_display_state()
+
+        # This path needs to be determined based on machine/OS version
+        # This value works for RPi OS Desktop 64-bit aarch64.
+        # It will not work for 32-bit OSes.
+        if DisplayController._backlight is None:
+            backlight_path = DisplayController.get_backlight_path()
+            if backlight_path is None:
+                _backlight = None
+            elif backlight_path != "":
+                _backlight = rpi_backlight.Backlight(backlight_path)
+            elif backlight_path == "":
+                _backlight = rpi_backlight.Backlight()
+            else:
+                logger.error("Could not resolve location of backlight")
 
     """
     The techniques used to manage diffrent displays was
@@ -130,6 +142,19 @@ class DisplayController():
     def is_raspberry_pi():
         # A weak test for the RPi
         return platform.machine() in ["armv7l", "armv8l", "aarch64"]
+
+    @staticmethod
+    def get_backlight_path():
+        """
+        Return the path to the backlight for this machine. This method was
+        necessitated by RPi OS 64-bit which changed the path to the backlight.
+        :return:
+        """
+        if DisplayController.is_raspberry_pi():
+            if platform.machine() in ["aarch64"]:
+                return "/sys/class/backlight/10-0045"
+            return ""
+        return None
 
     """
     These methods can be overriden in a derived class
