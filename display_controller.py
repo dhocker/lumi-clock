@@ -34,7 +34,7 @@
 import threading
 import subprocess
 import platform
-import rpi_backlight as backlight
+import rpi_backlight
 from app_logger import AppLogger
 
 # Logger init
@@ -62,6 +62,11 @@ class DisplayController():
     # Serializes access to the display
     _display_lock = threading.Lock()
     _backlight_state = 0
+
+    # This path needs to be determined based on machine/OS version
+    # This value works for RPi OS Desktop 64-bit aarch64.
+    # It will not work for 32-bit OSes.
+    _backlight = rpi_backlight.Backlight("/sys/class/backlight/10-0045")
 
     def __init__(self):
         """
@@ -168,7 +173,7 @@ class DisplayController():
                 state = cls._state_unknown
             else:
                 # rpi 7" touchscreen
-                if backlight.get_power():
+                if cls._backlight.power:
                     state = cls._state_display_on
                 else:
                     state = cls._state_display_off
@@ -186,9 +191,10 @@ class DisplayController():
                 subprocess.run(["vcgencmd", "display_power", "1"])
             else:
                 # rpi 7" touchscreen
-                a = "echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
-                logger.debug(a)
-                subprocess.check_output(a, shell=True)
+                # a = "echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
+                logger.debug("Turning display power on")
+                # subprocess.check_output(a, shell=True)
+                cls._backlight.power = True
         else:
             pass
         cls._backlight_state = 1
@@ -203,9 +209,10 @@ class DisplayController():
                 subprocess.run(["vcgencmd", "display_power", "0"])
             elif DisplayController.is_raspberry_pi():
                 # rpi 7" touchscreen
-                a = "echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
-                logger.debug(a)
-                subprocess.check_output(a, shell=True)
+                # a = "echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power"
+                logger.debug("Turning display power off")
+                # subprocess.check_output(a, shell=True)
+                cls._backlight.power = False
         else:
             pass
         cls._backlight_state = 0
@@ -220,9 +227,10 @@ class DisplayController():
                 pass
             elif DisplayController.is_raspberry_pi():
                 # rpi 7" touchscreen
-                a = "echo {0} | sudo tee /sys/class/backlight/rpi_backlight/brightness".format(brightness)
-                logger.debug(a)
-                subprocess.check_output(a, shell=True)
+                # a = "echo {0} | sudo tee /sys/class/backlight/rpi_backlight/brightness".format(brightness)
+                logger.debug("Setting display brightness")
+                # subprocess.check_output(a, shell=True)
+                cls.brightness = int(brightness)
         else:
             pass
         cls._display_lock.release()
