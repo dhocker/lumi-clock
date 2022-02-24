@@ -72,7 +72,6 @@ class DisplayController:
         count_down_time: in seconds, how long to wait before entering the
             display off state.
         """
-        self._display_state = DisplayController.query_display_state()
 
         # This path needs to be determined based on machine/OS version
         # This value works for RPi OS Desktop 64-bit aarch64.
@@ -87,6 +86,8 @@ class DisplayController:
                 _backlight = rpi_backlight.Backlight()
             else:
                 logger.error("Could not resolve location of backlight")
+
+        self._display_state = DisplayController.query_display_state()
 
     """
     The techniques used to manage diffrent displays was
