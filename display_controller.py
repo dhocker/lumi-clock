@@ -79,11 +79,11 @@ class DisplayController:
         if DisplayController._backlight is None:
             backlight_path = DisplayController.get_backlight_path()
             if backlight_path is None:
-                _backlight = None
+                DisplayController._backlight = None
             elif backlight_path != "":
-                _backlight = rpi_backlight.Backlight(backlight_path)
+                DisplayController._backlight = rpi_backlight.Backlight(backlight_path)
             elif backlight_path == "":
-                _backlight = rpi_backlight.Backlight()
+                DisplayController._backlight = rpi_backlight.Backlight()
             else:
                 logger.error("Could not resolve location of backlight")
 
