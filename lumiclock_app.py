@@ -58,7 +58,7 @@ class LumiClockApplication(tk.Frame):
         self.master["bg"] = 'black'
 
         # Set display brightness on RPi
-        DisplayController.set_display_backlight(QConfiguration.backlight)
+        DisplayController.set_display_backlight(int(QConfiguration.backlight))
 
         # Font size in pixels
         if QConfiguration.fontsize:

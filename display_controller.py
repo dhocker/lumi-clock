@@ -256,7 +256,8 @@ class DisplayController:
                 # a = "echo {0} | sudo tee /sys/class/backlight/rpi_backlight/brightness".format(brightness)
                 logger.debug("Setting display brightness")
                 # subprocess.check_output(a, shell=True)
-                cls.brightness = int(brightness)
+                # Scale brightness from 0-255 to 0-100
+                cls._backlight.brightness = int((brightness * 100) / 255)
         else:
             pass
         cls._display_lock.release()
