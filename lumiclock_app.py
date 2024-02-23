@@ -102,6 +102,7 @@ class LumiClockApplication(tk.Frame):
         return "break"
 
     def quit_app(self, event):
+        logger.debug("LumiClockApplication.quit_app() called")
         self.run_clock = False
         self.master.destroy()
 
@@ -346,5 +347,6 @@ class ContextMenu(tk.Menu):
         Quit app
         :return:
         """
+        logger.debug("ContextMenu._quit() called")
         self.destroy()
         self.parent.quit_app(None)
